@@ -4,7 +4,12 @@ import { LuPanelLeftClose } from "react-icons/lu";
 import { FiMessageSquare, FiTrash2 } from "react-icons/fi";
 import { SlOptions } from "react-icons/sl";
 import { useAuth } from "../utils/AuthContext";
-import { getChatsByUser, getChatConversation, craeteNewChat, deleteChatById } from "../services/chatService";
+import {
+  getChatsByUser,
+  getChatConversation,
+  craeteNewChat,
+  deleteChatById
+} from "../services/chatService";
 import { ContextApp } from "../utils/Context";
 import { useChat } from "../utils/ChatContext";
 
@@ -13,7 +18,7 @@ function LeftNav() {
   const { chats, setChats, setMessages, joinChat, setLoading, activeChatId, setActiveChatId } = useChat();
   const { user, logOutAction } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
-  
+
 
   const menuRef = useRef(null);
 
@@ -36,10 +41,13 @@ function LeftNav() {
 
   const handleChatClick = async (chatId) => {
     try {
+      setLoading(true);
+      joinChat(user.id, chatId);
       const chatHistory = await getChatConversation(chatId);
       console.log(chatHistory);
       setMessages(chatHistory);
       setActiveChatId(chatId);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -48,7 +56,7 @@ function LeftNav() {
   // delete chat
   const handleChatDelete = async (chatId) => {
     try {
-      const result = await deleteChatById(chatId);
+      await deleteChatById(chatId);
       const updatedChats = chats.filter((chat) => chat.id !== chatId);
       setChats(updatedChats);
       if (activeChatId === chatId) {
@@ -136,7 +144,8 @@ function LeftNav() {
         {/* msg  */}
         {chats.map((chat) => (
           <span
-            className="rounded w-full py-3 px-2 text-xs my-2 flex gap-1 items-center justify-between cursor-pointer hover:bg-gray-800 transition-all duration-300 overflow-hidden truncate whitespace-nowrap"
+            className={`rounded w-full py-3 px-2 text-xs my-2 flex gap-1 items-center justify-between cursor-pointer transition-all duration-300 overflow-hidden truncate whitespace-nowrap ${activeChatId === chat.id ? "bg-gray-800" : "hover:bg-gray-800"
+              }`}
             value={chat.title}
             onClick={() => handleChatClick(chat.id)}
             key={chat.id}
@@ -145,7 +154,7 @@ function LeftNav() {
               <FiMessageSquare />
               <span className="text-sm">{chat.title}</span>
             </span>
-            <FiTrash2 size={"15"} color="red" onClick={()=> handleChatDelete(chat.id)}/>
+            <FiTrash2 size={"15"} color="red" onClick={() => handleChatDelete(chat.id)} />
           </span>
         ))}
       </div>

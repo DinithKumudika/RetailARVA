@@ -26,15 +26,6 @@ const AuthProvider = ({ children }) => {
         }
     };
 
-    const isLoggedIn = () => {
-        const loggedInUser = localStorage.getItem("user");
-
-        if (!loggedInUser) {
-            return false;
-        }
-        return true;
-    }
-
     const logOutAction = () => {
         setUser(null);
         localStorage.removeItem("user");

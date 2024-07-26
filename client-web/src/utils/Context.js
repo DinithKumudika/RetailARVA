@@ -4,7 +4,6 @@ export const ContextApp = createContext();
 const AppContext = ({ children }) => {
   const [showSlide, setShowSlide] = useState(false);
   const [Mobile, setMobile] = useState(false);
-  const [chatValue, setChatValue] = useState("");
 
   // button Click function
   // const handleSend = async () => {
@@ -26,8 +25,6 @@ const AppContext = ({ children }) => {
         setShowSlide,
         Mobile,
         setMobile,
-        chatValue,
-        setChatValue,
       }}
     >
       {children}

@@ -1,9 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ContextApp } from "../utils/Context";
 import { LuPanelLeftOpen } from "react-icons/lu";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { RiSendPlane2Fill } from "react-icons/ri";
+import { useChat } from "../utils/ChatContext";
 import Chat from "./Chat";
+import { useAuth } from "../utils/AuthContext";
+import { addChatMessage } from "../services/chatService";
 
 function ChatContainer() {
   const {
@@ -11,11 +14,41 @@ function ChatContainer() {
     showSlide,
     setMobile,
     Mobile,
-    chatValue,
-    setChatValue,
-    handleSend,
     handleKeyPress,
   } = useContext(ContextApp);
+  const { activeChatId, setMessages, connectionRef } = useChat();
+  const { user } = useAuth();
+
+  const [message, setMessage] = useState("");
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (connectionRef.current) {
+      console.log(connectionRef.current);
+      const userConnection = { userId: user.id, chatId: activeChatId };
+      console.log(userConnection);
+
+      const addedMessage = await addChatMessage(activeChatId, message);
+      console.log(addedMessage);
+      setMessages(prevMessages => [...prevMessages, addedMessage]);
+
+      // connectionRef.current.stream("StreamMessage", userConnection, message)
+      //   .subscribe({
+      //     next: (msg) => {
+      //       setMessage(prevMessage => [...prevMessage, msg]);
+      //     },
+      //     complete: () => {
+      //       console.log("Streaming complete.");
+      //     },
+      //     error: (err) => {
+      //       console.error("Streaming error: ", err);
+      //     }
+      //   });
+    }
+    else {
+      console.log("no connection");
+    }
+  }
 
   return (
     <div
@@ -48,14 +81,14 @@ function ChatContainer() {
             type="text"
             placeholder="Send a message"
             className="h-full  text-white bg-transparent px-3 py-4 w-full border-none outline-none text-base"
-            value={chatValue}
-            onChange={(e) => setChatValue(e.target.value)}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             onKeyUp={handleKeyPress}
           />
           <RiSendPlane2Fill
             title="send message"
             className={
-              chatValue.length <= 0
+              message.length <= 0
                 ? "text-gray-400 cursor-auto mx-3 text-xl"
                 : "text-white cursor-pointer mx-3 text-3xl bg-green-500 p-1 rounded shadow-md "
             }

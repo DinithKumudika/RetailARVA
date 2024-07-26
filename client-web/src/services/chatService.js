@@ -20,6 +20,27 @@ export const getChatConversation = async (chatId) => {
     }
 }
 
+export const addChatMessage = async (chatId, message) => {
+    const newMessage = {
+        "chatId": chatId,
+        "content": message,
+        "role": "User"
+    }
+    try {
+        const response = await axios.post(`/api/chat-histories/${chatId}`, newMessage, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        const message = response.data.data;
+        console.log(message);
+        return message;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const craeteNewChat = async (userId) => {
     try {
         const createChat = {
@@ -43,8 +64,6 @@ export const craeteNewChat = async (userId) => {
 export const deleteChatById = async (chatId) => {
     try {
         const response = await axios.delete(`/api/chat/${chatId}`);
-        const message = response.data.message;
-        console.log(message);
         if (response.status === 204) {
             return true;
         }
