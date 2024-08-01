@@ -33,6 +33,19 @@ product_repo = ProductRepository(db)
 @app.route("/chat/gemini", methods=['POST'])
 def chat_with_assistant():
     gemini_chat = GeminiChat(env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'))
+    gemini_chat.set_parser(OutputParserTypes.STRING)
+    gemini_chat.set_vector_store(qdrant.get_collection("products"))
+    chat_response = gemini_chat.invoke("hello")
+
+    print(f"chat response: {chat_response.content}")
+
+    response = make_response(jsonify({
+        "response" : chat_response.content
+    }))
+
+    response.status_code = 201
+    response.headers['content-type'] = 'application/json'
+    return response
 
 
 @app.route("/products/embeddings", methods=['POST'])

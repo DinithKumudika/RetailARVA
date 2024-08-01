@@ -1,7 +1,8 @@
 from typing import List
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_qdrant import QdrantVectorStore
+from langchain_qdrant import QdrantVectorStore, RetrievalMode
 from langchain.docstore.document import Document
+from qdrant_client import QdrantClient
 
 class VectorDb:
     def __init__(self, url : str, api_key : str) -> None:
@@ -9,6 +10,24 @@ class VectorDb:
         self.url = url
         self.api_key = api_key
         self.vector_store = None
+
+    # def get_collection(self, collection: str):
+    #     self.vector_store = QdrantVectorStore(
+    #         client=QdrantClient(url=self.url, api_key=self.api_key, prefer_grpc=True),
+    #         collection_name=collection,
+    #         embedding=self.embeddings
+    #     )
+    #     return self.vector_store
+
+    def get_collection(self, collection: str) -> QdrantVectorStore:
+        self.vector_store = QdrantVectorStore.from_existing_collection(
+            collection_name=collection,
+            url=self.url,
+            api_key=self.api_key,
+            embedding=self.embeddings,
+            prefer_grpc=True
+        )
+        return self.vector_store
     
     def set_embedding_model(self, model_id : str, api_key : str):
         self.embeddings = GoogleGenerativeAIEmbeddings(model=model_id, google_api_key=api_key)
@@ -20,7 +39,7 @@ class VectorDb:
             url=self.url,
             prefer_grpc=True,
             api_key=self.api_key,
-            collection_name=collection,
+            collection_name=collection
         )
         self.vector_store = qdrant
     
