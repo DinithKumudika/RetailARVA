@@ -1,12 +1,13 @@
-import React, { useContext, useState } from "react";
-import { ContextApp } from "../utils/Context";
+import { useState } from "react";
 import { LuPanelLeftOpen } from "react-icons/lu";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { RiSendPlane2Fill } from "react-icons/ri";
-import { useChat } from "../utils/chatContext";
+import useChat from "../utils/useChat";
 import Chat from "./Chat";
-import { useAuth } from "../utils/authContext";
+import useAuth from "../utils/useAuth";
 import { addChatMessage } from "../services/chatService";
+import { TChatMessage } from "../utils/types";
+import useApp from "../utils/useApp";
 
 function ChatContainer() {
   const {
@@ -14,21 +15,40 @@ function ChatContainer() {
     showSlide,
     setMobile,
     Mobile,
-    handleKeyPress,
-  } = useContext(ContextApp);
+  } = useApp();
   const { activeChatId, setMessages, setChatResponseLoading, getAssistantResponse} = useChat();
   const { user } = useAuth();
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
 
-  const handleSend = async (e) => {
+  const handleKeyUp = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSend(e);
+    }
+  };
+
+  const handleSend = async (e: React.FormEvent | KeyboardEvent) => {
     e.preventDefault();
-    const addedMessage = await addChatMessage(activeChatId, message);
+    if (message.trim() === "") return;
+
+    if(!activeChatId)
+    {
+      throw new Error("active chat id not set");
+    }
+
+    const addedMessage : TChatMessage = await addChatMessage(activeChatId, message);
     console.log(addedMessage);
     setMessage("");
-    setMessages(prevMessages => [...prevMessages, addedMessage]);
+    setMessages((prevMessages : TChatMessage[]) => [...prevMessages, addedMessage]);
     setChatResponseLoading(true);
-    getAssistantResponse(user.id, message);
+    
+    if(!user)
+    {
+      throw new Error("user cannot be null");
+    }
+    else {
+      getAssistantResponse(user.id, message);
+    }
   }
 
   return (
@@ -64,7 +84,7 @@ function ChatContainer() {
             className="h-full  text-white bg-transparent px-3 py-4 w-full border-none outline-none text-base"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyUp={handleKeyPress}
+            onKeyUp={handleKeyUp}
           />
           <RiSendPlane2Fill
             title="send message"

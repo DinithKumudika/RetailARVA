@@ -1,26 +1,27 @@
-import React, { useContext, useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { LuPanelLeftClose } from "react-icons/lu";
 import { FiMessageSquare, FiTrash2 } from "react-icons/fi";
 import { SlOptions } from "react-icons/sl";
-import { useAuth } from "../utils/authContext";
+import useAuth from "../utils/useAuth";
 import {
   getChatsByUser,
   getChatConversation,
   craeteNewChat,
   deleteChatById
 } from "../services/chatService";
-import { ContextApp } from "../utils/Context";
-import { useChat } from "../utils/chatContext";
+import useChat from "../utils/useChat";
+import useApp from "../utils/useApp";
+import { TUserDto } from "../utils/types";
 
-function LeftNav() {
-  const { setShowSlide, showSlide } = useContext(ContextApp);
+const LeftNav: React.FC = () => {
+  const { setShowSlide, showSlide } = useApp();
   const { chats, setChats, setMessages, joinChat, setLoading, activeChatId, setActiveChatId } = useChat();
   const { user, logOutAction } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
 
 
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -32,17 +33,19 @@ function LeftNav() {
     setShowMenu(false);
   };
 
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
       setShowMenu(false);
     }
   };
 
 
-  const handleChatClick = async (chatId) => {
+  const handleChatClick = async (chatId: string) => {
     try {
       setLoading(true);
-      joinChat(user.id, chatId);
+      if (user && user.id) {
+        joinChat(user.id, chatId);
+      }
       const chatHistory = await getChatConversation(chatId);
       console.log(chatHistory);
       setMessages(chatHistory);
@@ -54,7 +57,7 @@ function LeftNav() {
   }
 
   // delete chat
-  const handleChatDelete = async (chatId) => {
+  const handleChatDelete = async (chatId: string) => {
     try {
       await deleteChatById(chatId);
       const updatedChats = chats.filter((chat) => chat.id !== chatId);
@@ -69,14 +72,14 @@ function LeftNav() {
   }
 
   // create new chat thread
-  const handleNewChat = async (userId) => {
+  const handleNewChat = async (userId: string) => {
     setLoading(true);
     try {
       // create new chat Id and only make it permanent when the first chat message sent
       const chatMessage = await craeteNewChat(userId);
       joinChat(userId, chatMessage.chatId);
       setMessages([chatMessage]);
-      const chats = await getChatsByUser(user);
+      const chats = await getChatsByUser(user!);
       setChats(chats);
       setActiveChatId(chatMessage.chatId);
     } catch (error) {
@@ -88,7 +91,7 @@ function LeftNav() {
   }
 
   useEffect(() => {
-    const fetchChats = async (user) => {
+    const fetchChats = async (user: TUserDto) => {
       try {
         const chats = await getChatsByUser(user);
         setChats(chats);
@@ -126,7 +129,7 @@ function LeftNav() {
       <div className="flex items-start justify-between w-full">
         <span
           className="border border-gray-600  rounded w-[80%] py-2 text-xs flex gap-1 items-center justify-center cursor-pointer"
-          onClick={() => handleNewChat(user.id)}
+          onClick={() => handleNewChat(user!.id)}
         >
           <AiOutlinePlus fontSize={18} />
           New Chat
@@ -146,7 +149,7 @@ function LeftNav() {
           <span
             className={`rounded w-full py-3 px-2 text-xs my-2 flex gap-1 items-center justify-between cursor-pointer transition-all duration-300 overflow-hidden truncate whitespace-nowrap ${activeChatId === chat.id ? "bg-gray-800" : "hover:bg-gray-800"
               }`}
-            value={chat.title}
+            chat-title={chat.title}
             onClick={() => handleChatClick(chat.id)}
             key={chat.id}
           >
@@ -168,7 +171,7 @@ function LeftNav() {
               alt="user"
               className="w-8 h-8 object-cover rounded-sm"
             />
-            {user.firstName + " " + user.lastName}
+            {user!.firstName + " " + user!.lastName}
           </span>
           <span className="rounded-md  px-1.5 py-0.5 text-xs font-medium uppercase text-gray-500" onClick={toggleMenu}>
             <SlOptions />

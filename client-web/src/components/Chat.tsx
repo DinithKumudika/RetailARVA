@@ -1,11 +1,13 @@
-import React from "react";
-import { useChat } from "../utils/chatContext";
-import LoadingDots from "../components/LoadingDots";
+import useChat from "../utils/useChat";
+import LoadingDots from "./LoadingDots";
 import ChatMessage from "./ChatMessage";
 import LoadingMessage from "./LoadingMessage";
+import { ChatRoles } from "../utils/types";
+import { TChatMessage } from "../utils/types";
+
 
 function Chat() {
-  const { messages, chatResponseLoading, msgEnd, loading, chatResponse, firstChunkReceived } = useChat();
+  const { messages, chatResponseLoading, msgEnd, loading, partialMessage, firstChunkReceived } = useChat();
   return (
     <div className=" w-full h-[85%] flex items-center justify-center overflow-hidden overflow-y-auto px-2 py-1 scroll">
       {loading ? (
@@ -14,8 +16,8 @@ function Chat() {
         </div>
       ) : (
         <div className="w-full lg:w-4/5 flex flex-col h-full items-start justify-start">
-          {messages && messages.length > 0 ? (messages?.map((message) => (
-            <ChatMessage key={message.id} message={message} />
+          {messages && messages.length > 0 ? (messages?.map((message: TChatMessage, idx: number) => (
+            <ChatMessage key={idx} message={message} />
           ))) : (
             <div className="w-full h-full flex flex-col items-center justify-center">
               <img
@@ -29,10 +31,14 @@ function Chat() {
             </div>
           )}
           {
-            chatResponseLoading ? (<LoadingMessage role={"Assistant"} />)
-              : (
-                firstChunkReceived && <ChatMessage message={chatResponse}/>
-              )
+            chatResponseLoading ? (<LoadingMessage role={ChatRoles[ChatRoles.Assistant]} />) : (
+              firstChunkReceived && 
+              <ChatMessage message={{
+                id: "",
+                role: ChatRoles[ChatRoles.Assistant],
+                content: partialMessage
+              }} />
+            )
           }
           <div ref={msgEnd} />
         </div>)}

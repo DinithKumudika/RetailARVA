@@ -1,11 +1,10 @@
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import AuthProvider from "./utils/authContext";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
-import ChatProvider from "./utils/chatContext";
-
-function App() {
+import { AuthProvider } from "./utils/authContext";
+import { ChatProvider } from "./utils/chatContext";
+const App = () => {
   return (
     <div className="overflow-hidden">
       <Router>

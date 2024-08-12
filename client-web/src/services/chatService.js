@@ -1,5 +1,10 @@
 import axios from "axios";
 
+export const ChatRoles = Object.freeze({
+    USER:   Symbol("User"),
+    ASSISTANT:  Symbol("Assistant")
+});
+
 export const getChatsByUser = async (user) => {
     try {
         const response = await axios.get(`/api/chat/${user.id}`);
@@ -24,7 +29,7 @@ export const addChatMessage = async (chatId, message) => {
     const newMessage = {
         "chatId": chatId,
         "content": message,
-        "role": "User"
+        "role": ChatRoles.USER.description
     }
     try {
         const response = await axios.post(`/api/chat-histories/${chatId}`, newMessage, {

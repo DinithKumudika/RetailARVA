@@ -7,9 +7,12 @@ const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   // const [connection, setConnection] = useState();
   const [loading, setLoading] = useState(false);
+  const [chatResponseLoading, setChatResponseLoading] = useState(false);
   const msgEnd = useRef(null);
   const [activeChatId, setActiveChatId] = useState(null);
   const connectionRef = useRef(null);
+  const [chatResponse, setChatResponse] = useState("");
+  const [firstChunkReceived, setFirstChunkRecieved] = useState(false);
 
   const joinChat = async (userId, chatId) => {
     // initiate connection
@@ -33,6 +36,37 @@ const ChatProvider = ({ children }) => {
     }
   };
 
+  const getAssistantResponse = async (userId, message) => {
+    if (connectionRef.current) {
+      console.log(connectionRef.current);
+      const userConnection = { userId: userId, chatId: activeChatId };
+      console.log(userConnection);
+
+      connectionRef.current.stream("StreamMessage", userConnection, message)
+        .subscribe({
+          next: (msg) => {
+            setChatResponseLoading(false);
+            setFirstChunkRecieved(true);
+            console.log(msg);
+            setChatResponse(prevMessage => [...prevMessage, msg]);
+          },
+          complete: () => {
+            console.log("Streaming complete.");
+            setChatResponseLoading(false);
+            setFirstChunkRecieved(false);
+          },
+          error: (err) => {
+            console.error("Streaming error: ", err);
+            setChatResponseLoading(false);
+            setFirstChunkRecieved(false);
+          }
+        });
+    }
+    else {
+      console.log("no connection");
+    }
+  }
+
   return (
     <ChatContext.Provider
       value={{
@@ -46,7 +80,14 @@ const ChatProvider = ({ children }) => {
         joinChat,
         activeChatId,
         setActiveChatId,
+        chatResponseLoading,
+        chatResponse,
+        setChatResponse,
+        setChatResponseLoading,
+        firstChunkReceived,
+        setFirstChunkRecieved,
         connectionRef,
+        getAssistantResponse
       }}
     >
       {children}
