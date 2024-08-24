@@ -1,4 +1,4 @@
-from utils.gemini_chat import GeminiChat, OutputParserTypes
+from utils.chatbot import Chatbot, OutputParserTypes
 from utils.stt import speech_to_text
 from configs.database import Database
 from playsound import playsound
@@ -9,7 +9,7 @@ import os
 def main():
     sleeping = True
     env = dotenv_values("../.env")
-    gemini_chat = GeminiChat(env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'))
+    gemini_chat = Chatbot(env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'))
     db = Database(env.get('DATABASE_URL'))
     db.connect()
     create_all(db)

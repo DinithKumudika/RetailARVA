@@ -11,9 +11,10 @@ from langchain_core.prompts import PromptTemplate
 from langchain.docstore.document import Document
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from utils.prompts import Prompts
 from  langchain_core.prompts.chat import HumanMessagePromptTemplate
-
+from langchain_core.runnables.base import RunnableSerializable
+from langchain_ollama.chat_models import ChatOllama
+from utils import prompts
 from enum import Enum
 from uuid import uuid4, UUID
 
@@ -28,13 +29,19 @@ class ChatRoles(Enum):
     USER = 2
     SYSTEM = 3
 
-class GeminiChat:
-    def __init__(self, api_key: str, model_id: str = "gemini-1.0-pro") -> None:
-        self.model = ChatGoogleGenerativeAI(
-            model=model_id, 
-            google_api_key=api_key,
-            convert_system_message_to_human=True
-        )
+class Chatbot:
+    def __init__(self, api_key: str = None, model_id: str = "gemini-1.5-pro") -> None:
+        if model_id == "gemini-1.5-pro":
+            self.model = ChatGoogleGenerativeAI(
+                model=model_id, 
+                google_api_key=api_key,
+                convert_system_message_to_human=True
+            )
+        else:
+            self.model = ChatOllama(
+                model=model_id,
+                temperature=0.5
+            )
         self.vector_store: QdrantVectorStore | None = None
         self.parser : object | None  = None
         self.contextualize_q_chain = None
@@ -45,7 +52,7 @@ class GeminiChat:
             store[session_id] = InMemoryChatMessageHistory()
         return store[session_id]
     
-    def get_chat_history(self):
+    def get_chat_history(self) -> list:
         return self.chatHistory
     
     def add_message_to_history(self, message : str, role: ChatRoles):
@@ -72,27 +79,47 @@ class GeminiChat:
             return self.contextualize_q_chain
         else:
             return input["question"]
+        
+    def greet(self) -> str:
+        # prompt = ChatPromptTemplate.from_messages(
+        #     [
+        #         SystemMessage(content=f"{Prompts.system_prompt}\n{Prompts.greet_prompt}"),
+        #     ]
+        # )
+        prompt = PromptTemplate.from_template(f"{prompts.system_prompt}\n{prompts.greet_prompt}")
+        llm_chain : RunnableSerializable = prompt | self.model | self.parser
+
+        response = llm_chain.invoke({})
+
+        return response
+
     
     def invoke(self, query: str) -> str:
         
         try:
-
             retriever = self.vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 4})
 
-            # retriever.get_relevant_documents(query=query)
+            # docs = retriever.get_relevant_documents(query=query)
             docs = retriever.invoke(input=query)
             print(f"Retrieved Context: \n{self.format_docs(docs)}")
 
-            contextualize_q_prompt = ChatPromptTemplate.from_messages(
-                [
-                    SystemMessage(content=Prompts.contextualize_q_system_prompt),
-                    MessagesPlaceholder(variable_name="chat_history"),
-                    HumanMessagePromptTemplate.from_template("{question}")
-                    # HumanMessage(content=f"{question}"),
-                ]
-            )
+            # contextualize_q_prompt = ChatPromptTemplate.from_messages(
+            #     [
+            #         SystemMessage(content=Prompts.contextualize_q_system_prompt),
+            #         MessagesPlaceholder(variable_name="chat_history"),
+            #         # HumanMessagePromptTemplate.from_template("question: {question}"),
+            #         HumanMessage(content="question: {question}"),
+            #     ]
+            # )
 
-            contextualize_q_chain = contextualize_q_prompt | self.model | self.parser
+            # formatted_contextualize_q_prompt = contextualize_q_prompt.format(
+            #     chat_history=self.chatHistory, 
+            #     question=query
+            # )
+            # print(f"Contextualize Q Prompt: \n{formatted_contextualize_q_prompt}")
+            # print("\nEnd of Contextualize Q Prompt\n")
+
+            # self.contextualize_q_chain = contextualize_q_prompt | self.model | self.parser
 
             # history_aware_retriever = create_history_aware_retriever(
             #     self.model, 
@@ -104,43 +131,42 @@ class GeminiChat:
             print(f"session id of new sesion: {session_id}")
             print(f"session history: {self.get_session_history(session_id=session_id)}")
 
-            contextualize_q_chain.invoke(
-                {
-                    "chat_history": self.chatHistory,
-                    "question": query,
-                }
-            )
-
-            # qa_system_prompt = PromptTemplate.from_template(Prompts.qa_system_prompt_template)
-
-            # print(f"QA system prompt: {qa_system_prompt}")
+            # contextualize_q = self.contextualize_q_chain.invoke(
+            #     {
+            #         "chat_history": self.chatHistory,
+            #         "question": query,
+            #     }
+            # )
+            
+            # print(f"contextualized question: {contextualize_q}")
 
             rag_prompt = ChatPromptTemplate.from_messages(
                 [
-                    SystemMessage(content=f"{Prompts.system_prompt}\n{Prompts.qa_system_prompt}"),
+                    SystemMessage(content=f"{prompts.system_prompt}\n{prompts.qa_system_prompt_updated}"),
                     MessagesPlaceholder(variable_name="chat_history"),
-                    HumanMessagePromptTemplate.from_template("{question}"),
-                    # HumanMessage(content=f"{question}"),
+                    # HumanMessagePromptTemplate.from_template("question: {question}"),
+                    HumanMessage(content="{question}"),
                 ]
             )
-
-            rag_chain = (
-                RunnablePassthrough.assign(
-                    context = self.contextualized_question | retriever | self.format_docs
-                )
-                | rag_prompt
-                | self.model
+            
+            # Render and print the RAG prompt
+            formatted_rag_prompt = rag_prompt.format(
+                chat_history=self.chatHistory, 
+                question=query
             )
+            print(f"RAG Prompt: \n{formatted_rag_prompt}")
+            print("\nEnd of RAG Prompt\n")
 
-            print(f"RAG Prompt: \n {rag_prompt}")
-
-            print(f"Chat History: {self.chatHistory}")
+            rag_chain = rag_prompt | self.model | self.parser
 
             response = rag_chain.invoke({
                     "question": query,
-                    "chat_history": self.chatHistory
+                    "chat_history": self.chatHistory,
+                    "context": self.format_docs(docs)
                 }
             )
+            
+            print(f"bot response: {response}")
 
             return response
 

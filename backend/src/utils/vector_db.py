@@ -3,10 +3,11 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_qdrant import QdrantVectorStore, RetrievalMode
 from langchain.docstore.document import Document
 from qdrant_client import QdrantClient
+from langchain_ollama import OllamaEmbeddings
 
 class VectorDb:
     def __init__(self, url : str, api_key : str) -> None:
-        self.embeddings = None
+        self.embeddings = OllamaEmbeddings | GoogleGenerativeAIEmbeddings | None
         self.url = url
         self.api_key = api_key
         self.vector_store = None
@@ -29,8 +30,12 @@ class VectorDb:
         )
         return self.vector_store
     
-    def set_embedding_model(self, model_id : str, api_key : str):
-        self.embeddings = GoogleGenerativeAIEmbeddings(model=model_id, google_api_key=api_key)
+    def set_embedding_model(self, model_id : str, api_key : str = None):
+        if api_key is None:
+            self.embeddings = OllamaEmbeddings(model=model_id)
+        else:
+            self.embeddings = GoogleGenerativeAIEmbeddings(model=model_id, google_api_key=api_key)
+        print(self.embeddings)
     
     def embed_documents(self, docs : List[Document], collection: str) -> QdrantVectorStore:
         qdrant = QdrantVectorStore.from_documents(

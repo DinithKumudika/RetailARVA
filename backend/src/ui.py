@@ -1,39 +1,51 @@
-import random
 import gradio as gr
-from utils.gemini_chat import GeminiChat, OutputParserTypes
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from dotenv import dotenv_values
-
+from gradio import ChatMessage
 from utils.vector_db import VectorDb
+from utils.chatbot import Chatbot, OutputParserTypes
+from langchain_core.messages import HumanMessage, AIMessage
 
 env = dotenv_values("../.env")
 
-qdrant = VectorDb(
-    env.get('QDRANT_CLUSTER_URL'), 
-    env.get('QDRANT_API_KEY')
-)
-qdrant.set_embedding_model(model_id="models/embedding-001", api_key=env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'))
+def qdrant_init():
+    qdrant = VectorDb(
+        env.get('QDRANT_CLUSTER_URL'), 
+        env.get('QDRANT_API_KEY')
+    )
+    qdrant.set_embedding_model(model_id="llama3.1")
+    return qdrant
 
-def chat_fucntion(message, history):
-    gemini_chat = GeminiChat(env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'))
+def chat_init():
+    gemini_chat = Chatbot(model_id="llama3.1")
     gemini_chat.set_parser(OutputParserTypes.STRING)
+    
+    qdrant = qdrant_init()
     gemini_chat.set_vector_store(qdrant.get_collection("products"))
+    return gemini_chat
+
+gemini_chat = chat_init()
+
+def greet_user():
+    greeting = gemini_chat.greet()
+    gemini_chat.chatHistory.append(AIMessage(content=greeting))
+    return greeting
+
+
+def chat_fucntion(message, history: list):
     chat_response = gemini_chat.invoke(message)
+    gemini_chat.chatHistory.append(HumanMessage(content=message))
+    gemini_chat.chatHistory.append(AIMessage(content=chat_response))
+    print(f"Chat History: {gemini_chat.get_chat_history()}")
 
-    gemini_chat.chatHistory.extend([
-        HumanMessage(content=message),
-        AIMessage(content=chat_response.content)
-    ])
-
-    return chat_response.content
+    return chat_response
 
 gr.ChatInterface(
-    chat_fucntion,
+    fn=chat_fucntion,
     title="RetailARVA Bot",
-    chatbot=gr.Chatbot(height=500),
+    chatbot=gr.Chatbot(height=500, value=[[None, greet_user()]]),
     textbox=gr.Textbox(placeholder="Message chatbot", container=False, scale=7),
-    theme="soft",
+    theme=gr.themes.Monochrome(),
     retry_btn=None,
     undo_btn=None,
     clear_btn="Clear"
-).launch()
+).launch(share=True)
