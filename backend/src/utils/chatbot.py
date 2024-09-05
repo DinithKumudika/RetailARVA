@@ -1,5 +1,4 @@
 from typing import List
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
@@ -13,10 +12,10 @@ from langchain.chains import create_history_aware_retriever, create_retrieval_ch
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from  langchain_core.prompts.chat import HumanMessagePromptTemplate
 from langchain_core.runnables.base import RunnableSerializable
-from langchain_ollama.chat_models import ChatOllama
 from utils import prompts
 from enum import Enum
 from uuid import uuid4, UUID
+from src.utils.rag_helper import RagHelper
 
 store = {}
 
@@ -30,18 +29,8 @@ class ChatRoles(Enum):
     SYSTEM = 3
 
 class Chatbot:
-    def __init__(self, api_key: str = None, model_id: str = "gemini-1.5-pro") -> None:
-        if model_id == "gemini-1.5-pro":
-            self.model = ChatGoogleGenerativeAI(
-                model=model_id, 
-                google_api_key=api_key,
-                convert_system_message_to_human=True
-            )
-        else:
-            self.model = ChatOllama(
-                model=model_id,
-                temperature=0.5
-            )
+    def __init__(self) -> None:
+        self.model = RagHelper().get_llm()
         self.vector_store: QdrantVectorStore | None = None
         self.parser : object | None  = None
         self.contextualize_q_chain = None
@@ -54,6 +43,14 @@ class Chatbot:
     
     def get_chat_history(self) -> list:
         return self.chatHistory
+    
+    def serialize_message(self, message):
+        if isinstance(message, HumanMessage):
+            return {"type": "human", "content": message.content}
+        elif isinstance(message, AIMessage):
+            return {"type": "ai", "content": message.content}
+        else:
+            return {"type": "unknown", "content": str(message)}
     
     def add_message_to_history(self, message : str, role: ChatRoles):
         if role.name == ChatRoles.ASSISTANT:
@@ -130,6 +127,9 @@ class Chatbot:
             session_id : str = str(self.create_new_session())
             print(f"session id of new sesion: {session_id}")
             print(f"session history: {self.get_session_history(session_id=session_id)}")
+            
+            # Serialize chat history for the prompt
+            serialized_history = [self.serialize_message(msg) for msg in self.chatHistory]
 
             # contextualize_q = self.contextualize_q_chain.invoke(
             #     {
@@ -152,17 +152,31 @@ class Chatbot:
             # Render and print the RAG prompt
             formatted_rag_prompt = rag_prompt.format(
                 chat_history=self.chatHistory, 
-                question=query
+                question=query,
+                context=self.format_docs(docs)
             )
             print(f"RAG Prompt: \n{formatted_rag_prompt}")
             print("\nEnd of RAG Prompt\n")
 
-            rag_chain = rag_prompt | self.model | self.parser
+            # rag_chain = rag_prompt | self.model | self.parser
+            
+            rag_chain = (
+                {
+                    "context": retriever | self.format_docs,
+                    "question": RunnablePassthrough(),
+                    "chat_history": RunnablePassthrough()
+                }
+                | rag_prompt
+                | self.model
+                | self.parser
+            )
+            
+            print(f"Chat History Content: {self.chatHistory}")
+
 
             response = rag_chain.invoke({
                     "question": query,
-                    "chat_history": self.chatHistory,
-                    "context": self.format_docs(docs)
+                    "chat_history": self.chatHistory
                 }
             )
             

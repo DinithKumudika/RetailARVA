@@ -12,11 +12,11 @@ def qdrant_init():
         env.get('QDRANT_CLUSTER_URL'), 
         env.get('QDRANT_API_KEY')
     )
-    qdrant.set_embedding_model(model_id="llama3.1")
+    qdrant.set_embedding_model()
     return qdrant
 
 def chat_init():
-    gemini_chat = Chatbot(model_id="llama3.1")
+    gemini_chat = Chatbot()
     gemini_chat.set_parser(OutputParserTypes.STRING)
     
     qdrant = qdrant_init()
@@ -32,10 +32,10 @@ def greet_user():
 
 
 def chat_fucntion(message, history: list):
+    print(f"Chat History: {gemini_chat.chatHistory}")
     chat_response = gemini_chat.invoke(message)
     gemini_chat.chatHistory.append(HumanMessage(content=message))
     gemini_chat.chatHistory.append(AIMessage(content=chat_response))
-    print(f"Chat History: {gemini_chat.get_chat_history()}")
 
     return chat_response
 
@@ -48,4 +48,4 @@ gr.ChatInterface(
     retry_btn=None,
     undo_btn=None,
     clear_btn="Clear"
-).launch(share=True)
+).launch(share=True, debug=True)
