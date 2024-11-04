@@ -4,6 +4,7 @@ from gradio import ChatMessage
 from utils.vector_db import VectorDb
 from utils.chatbot import Chatbot, OutputParserTypes
 from langchain_core.messages import HumanMessage, AIMessage
+from configs.database import Database
 
 env = dotenv_values("../.env")
 
@@ -13,10 +14,17 @@ def qdrant_init():
         env.get('QDRANT_API_KEY')
     )
     qdrant.set_embedding_model()
+    print("embeddings: ", qdrant.embeddings)
     return qdrant
 
+def db_init():
+    db = Database(env.get('DATABASE_URL'))
+    db.connect()
+    return db
+
 def chat_init():
-    gemini_chat = Chatbot()
+    db = db_init()
+    gemini_chat = Chatbot(db)
     gemini_chat.set_parser(OutputParserTypes.STRING)
     
     qdrant = qdrant_init()
@@ -27,15 +35,11 @@ gemini_chat = chat_init()
 
 def greet_user():
     greeting = gemini_chat.greet()
-    gemini_chat.chatHistory.append(AIMessage(content=greeting))
     return greeting
 
 
 def chat_fucntion(message, history: list):
-    print(f"Chat History: {gemini_chat.chatHistory}")
     chat_response = gemini_chat.invoke(message)
-    gemini_chat.chatHistory.append(HumanMessage(content=message))
-    gemini_chat.chatHistory.append(AIMessage(content=chat_response))
 
     return chat_response
 

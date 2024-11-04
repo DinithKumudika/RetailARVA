@@ -30,7 +30,7 @@ def create_app():
         env.get('QDRANT_CLUSTER_URL'), 
         env.get('QDRANT_API_KEY')
     )
-    qdrant.set_embedding_model(model_id="llama3.1")
+    qdrant.set_embedding_model()
 
     def get_qdrant() -> VectorDb:
         if 'qdrant' not in g:
