@@ -46,4 +46,8 @@ qa_system_prompt_updated: str = """
         - Be accurate and through.
         
     Context: {context}
+    
+    Chat History: {chat_history}
+    
+    Question: {question}
 """

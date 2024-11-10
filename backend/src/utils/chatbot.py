@@ -133,7 +133,7 @@ class Chatbot:
         print(f"length of chat history: {len(formatted_messages)}")
         
         try:
-            retriever = self.vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 4})
+            retriever = self.vector_store.as_retriever(search_type="similarity_score_threshold", search_kwargs={"k": 2, "score_threshold": 0.5})
 
             # docs = retriever.get_relevant_documents(query=query)
             docs = retriever.invoke(input=query)
@@ -172,14 +172,16 @@ class Chatbot:
             
             # print(f"contextualized question: {contextualize_q}")
             
-            rag_prompt = ChatPromptTemplate.from_messages(
-                [
-                    SystemMessage(content=f"{prompts.system_prompt}\n{prompts.qa_system_prompt_updated}"),
-                    MessagesPlaceholder(variable_name="chat_history"),
-                    # HumanMessagePromptTemplate.from_template("question: {question}"),
-                    HumanMessage(content="{question}"),
-                ]
-            )
+            # rag_prompt = ChatPromptTemplate.from_messages(
+            #     [
+            #         SystemMessage(content=f"{prompts.system_prompt}\n{prompts.qa_system_prompt_updated}"),
+            #         MessagesPlaceholder(variable_name="chat_history"),
+            #         # HumanMessagePromptTemplate.from_template("question: {question}"),
+            #         HumanMessage(content="{question}"),
+            #     ]
+            # )
+            
+            rag_prompt = PromptTemplate.from_template(f"{prompts.system_prompt}\n{prompts.qa_system_prompt_updated}")
             
             # Render and print the RAG prompt
             formatted_rag_prompt = rag_prompt.format(
@@ -187,25 +189,24 @@ class Chatbot:
                 question=query,
                 context=self.format_docs(docs)
             )
-            # print(f"RAG Prompt: \n{formatted_rag_prompt}")
-            # print("\nEnd of RAG Prompt\n")
+            print(f"RAG Prompt: \n{formatted_rag_prompt}")
+            print("\nEnd of RAG Prompt\n")
 
-            rag_chain = rag_prompt | self.model | self.parser
+            # rag_chain = rag_prompt | self.model | self.parser
             
-            # rag_chain = (
-            #     {
-            #         "context": retriever | self.format_docs,
-            #         "question": RunnablePassthrough(),
-            #         "chat_history": RunnablePassthrough()
-            #     }
-            #     | rag_prompt
-            #     | self.model
-            #     | self.parser
-            # )
+            rag_chain = (
+                {
+                    "context": retriever | self.format_docs,
+                    "question": RunnablePassthrough(),
+                    "chat_history": formatted_messages
+                }
+                | rag_prompt
+                | self.model
+                | self.parser
+            )
 
             response = rag_chain.invoke({
-                    "question": query,
-                    "chat_history": formatted_messages
+                    "question": query
                 }
             )
             
