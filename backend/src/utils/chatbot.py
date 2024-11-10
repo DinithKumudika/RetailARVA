@@ -1,14 +1,13 @@
 from typing import List
+import langchain 
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
-from langchain_core.runnables import RunnableMap, RunnablePassthrough
+from langchain.schema.runnable import RunnablePassthrough
 from langchain_qdrant import QdrantVectorStore
 from langchain_core.prompts import PromptTemplate
 from langchain.docstore.document import Document
 from langchain_core.runnables.base import RunnableSerializable
-from langchain.memory import ConversationBufferWindowMemory
 from utils import prompts
 from enum import Enum
 from uuid import uuid4, UUID
@@ -18,6 +17,7 @@ from repositories.message_repository import MessageRepository
 from repositories.chat_repository import ChatRepository
 from configs.database import Database
 
+langchain.debug=True
 
 class OutputParserTypes(Enum):
     STRING = 1
@@ -134,81 +134,36 @@ class Chatbot:
         
         try:
             retriever = self.vector_store.as_retriever(search_type="similarity_score_threshold", search_kwargs={"k": 2, "score_threshold": 0.5})
-
-            # docs = retriever.get_relevant_documents(query=query)
+            
             docs = retriever.invoke(input=query)
-            # print(f"Retrieved Context: \n{self.format_docs(docs)}")
-
-            # contextualize_q_prompt = ChatPromptTemplate.from_messages(
-            #     [
-            #         SystemMessage(content=Prompts.contextualize_q_system_prompt),
-            #         MessagesPlaceholder(variable_name="chat_history"),
-            #         # HumanMessagePromptTemplate.from_template("question: {question}"),
-            #         HumanMessage(content="question: {question}"),
-            #     ]
-            # )
-
-            # formatted_contextualize_q_prompt = contextualize_q_prompt.format(
-            #     chat_history=self.chatHistory, 
-            #     question=query
-            # )
-            # print(f"Contextualize Q Prompt: \n{formatted_contextualize_q_prompt}")
-            # print("\nEnd of Contextualize Q Prompt\n")
-
-            # self.contextualize_q_chain = contextualize_q_prompt | self.model | self.parser
-
-            # history_aware_retriever = create_history_aware_retriever(
-            #     self.model, 
-            #     retriever, 
-            #     contextualize_q_prompt
-            # )
+            formatted_context = self.format_docs(docs)
             
-            # contextualize_q = self.contextualize_q_chain.invoke(
-            #     {
-            #         "chat_history": self.chatHistory,
-            #         "question": query,
-            #     }
-            # )
+            print(f"retrieved Context: \n {formatted_context}")
             
-            # print(f"contextualized question: {contextualize_q}")
-            
-            # rag_prompt = ChatPromptTemplate.from_messages(
-            #     [
-            #         SystemMessage(content=f"{prompts.system_prompt}\n{prompts.qa_system_prompt_updated}"),
-            #         MessagesPlaceholder(variable_name="chat_history"),
-            #         # HumanMessagePromptTemplate.from_template("question: {question}"),
-            #         HumanMessage(content="{question}"),
-            #     ]
-            # )
-            
-            rag_prompt = PromptTemplate.from_template(f"{prompts.system_prompt}\n{prompts.qa_system_prompt_updated}")
+            rag_prompt = ChatPromptTemplate.from_messages(
+                [
+                    SystemMessage(content=f"{prompts.system_prompt}"),
+                    HumanMessagePromptTemplate(
+                        prompt=PromptTemplate(
+                            template=prompts.qa_system_prompt_updated,
+                            input_variables=["context", "question", "chat_history"]
+                        )
+                    )
+                ]
+            )
             
             # Render and print the RAG prompt
             formatted_rag_prompt = rag_prompt.format(
                 chat_history=formatted_messages, 
                 question=query,
-                context=self.format_docs(docs)
+                context=formatted_context
             )
             print(f"RAG Prompt: \n{formatted_rag_prompt}")
             print("\nEnd of RAG Prompt\n")
 
-            # rag_chain = rag_prompt | self.model | self.parser
-            
-            rag_chain = (
-                {
-                    "context": retriever | self.format_docs,
-                    "question": RunnablePassthrough(),
-                    "chat_history": formatted_messages
-                }
-                | rag_prompt
-                | self.model
-                | self.parser
-            )
+            rag_chain = rag_prompt | self.model | self.parser
 
-            response = rag_chain.invoke({
-                    "question": query
-                }
-            )
+            response = rag_chain.invoke({"question": query, "chat_history": formatted_messages, "context": formatted_context})
             
             print(f"bot response: {response}")
             
@@ -219,52 +174,6 @@ class Chatbot:
             )
 
             return response
-
-            # print(f"QA system prompt: {qa_system_prompt}")
-
-            # rag_prompt = ChatPromptTemplate.from_messages(
-            #     [
-            #         SystemMessage(content=f"{Prompts.system_prompt}\n{Prompts.qa_system_prompt_template}"),
-            #         MessagesPlaceholder(variable_name="chat_history"),
-            #         HumanMessagePromptTemplate.from_template("{input}"),
-            #     ]
-            # )
-
-            # print(f"RAG prompt: \n {rag_prompt}")
-
-            # question_answer_chain = create_stuff_documents_chain(self.model, rag_prompt)
-            # rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
-
-            # coversational_rag_chain = RunnableWithMessageHistory(
-            #     rag_chain, 
-            #     self.get_session_history, 
-            #     input_messages_key="input",
-            #     history_messages_key="chat_history",
-            #     output_messages_key="answer"
-            # )
-
-            # session_id : str = str(self.create_new_session())
-
-            # result = contextualize_q_chain.invoke(
-            #     {"input": query},
-            #     config={"configurable": {"session_id": f"{session_id}"}},
-            # )["answer"]
-
-            # print(result)
-        
-        # rag_chain = (
-            #     {"context": retriever | self.format_docs , "question": RunnablePassthrough()}
-            #     | rag_prompt
-            #     | self.model
-            #     | self.parser
-            # )
-
-            # rag_chain_with_parser = RunnableMap(
-            #     {
-            #         "output": rag_chain,
-            #         "parsed_output": self.parser,
-            #     }
-            # )
             
         except Exception as e:
             raise
