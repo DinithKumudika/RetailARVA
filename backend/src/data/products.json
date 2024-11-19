@@ -1,0 +1,932 @@
+[
+     {
+          "id": 1,
+          "name": "Himalaya Purifying Neem Face Wash 100ml",
+          "brand": "Himalaya",
+          "category": "Face Wash",
+          "price": 1334.8,
+          "ingredients": [
+               "Neem",
+               "Turmeric"
+          ],
+          "key_ingredients": [
+               "Neem",
+               "Turmeric"
+          ],
+          "benefits": "Purifies skin, removes impurities",
+          "side_effects": "Dryness in some cases",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Acne",
+               "Oil Control"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Turmeric"
+     },
+     {
+          "id": 2,
+          "name": "Dr. Rashel Intimate Magic Pink Cream",
+          "brand": "Dr. Rashel",
+          "category": "Cream",
+          "price": 1504.0,
+          "ingredients": [
+               "Herbal extracts"
+          ],
+          "key_ingredients": [
+               "Herbal extracts"
+          ],
+          "benefits": "Lightens and brightens intimate areas",
+          "side_effects": "Mild irritation",
+          "is_natural": 1,
+          "concentrations": "High",
+          "usage": "As needed",
+          "application_tips": "Apply to desired areas, massage gently",
+          "skin_types": "All Skin Types",
+          "skin_concerns": "Pigmentation",
+          "allergens": null,
+          "sensitivities": "Sensitive to herbal extracts"
+     },
+     {
+          "id": 3,
+          "name": "Rivaj UK Deep Cleansing Black Mask Whitening Complex 6pcs",
+          "brand": "Rivaj UK",
+          "category": "Mask",
+          "price": 1974.0,
+          "ingredients": [
+               "Charcoal",
+               "Aloe Vera"
+          ],
+          "key_ingredients": [
+               "Charcoal",
+               "Aloe Vera"
+          ],
+          "benefits": "Deep cleanses, whitens skin",
+          "side_effects": "Possible irritation",
+          "is_natural": 0,
+          "concentrations": "Standard",
+          "usage": "Weekly",
+          "application_tips": "Apply evenly, let dry, peel off",
+          "skin_types": [
+               "Oily",
+               "Combination"
+          ],
+          "skin_concerns": [
+               "Blackheads",
+               "Dull Skin"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Charcoal"
+     },
+     {
+          "id": 4,
+          "name": "Mamaearth Ubtan Face Scrub With Turmeric & Walnut For Tan Removal",
+          "brand": "Mamaearth",
+          "category": "Scrub",
+          "price": 2716.6,
+          "ingredients": [
+               "Turmeric",
+               "Walnut"
+          ],
+          "key_ingredients": [
+               "Turmeric",
+               "Walnut"
+          ],
+          "benefits": "Exfoliates, removes tan",
+          "side_effects": "Can be harsh on dry skin",
+          "is_natural": 1,
+          "concentrations": "High",
+          "usage": "Weekly",
+          "application_tips": "Massage on face for 2-3 minutes, rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": "Tan Removal",
+          "allergens": null,
+          "sensitivities": "Sensitive to Walnut"
+     },
+     {
+          "id": 5,
+          "name": "Mamaearth Charcoal Face Wash for Oil Control 100ml",
+          "brand": "Mamaearth",
+          "category": "Face Wash",
+          "price": 2716.6,
+          "ingredients": [
+               "Charcoal",
+               "Tea Tree"
+          ],
+          "key_ingredients": [
+               "Charcoal",
+               "Tea Tree"
+          ],
+          "benefits": "Controls oil, deep cleanses",
+          "side_effects": "Can be drying",
+          "is_natural": 0,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Oily Skin",
+          "skin_concerns": "Oil Control",
+          "allergens": null,
+          "sensitivities": "Sensitive to Charcoal"
+     },
+     {
+          "id": 6,
+          "name": "Mamaearth Tea Tree Facewash for Acne & Pimples 100ml",
+          "brand": "Mamaearth",
+          "category": "Face Wash",
+          "price": 2716.6,
+          "ingredients": [
+               "Tea Tree",
+               "Neem"
+          ],
+          "key_ingredients": [
+               "Tea Tree",
+               "Neem"
+          ],
+          "benefits": "Reduces acne, prevents pimples",
+          "side_effects": "Slight tingling",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Acne-Prone Skin",
+          "skin_concerns": [
+               "Acne",
+               "Pimples"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Tea Tree"
+     },
+     {
+          "id": 7,
+          "name": "Mamaearth Ubtan Face Wash with Turmeric & Saffron for Tan Removal",
+          "brand": "Mamaearth",
+          "category": "Face Wash",
+          "price": 2716.6,
+          "ingredients": [
+               "Turmeric",
+               "Saffron"
+          ],
+          "key_ingredients": [
+               "Turmeric",
+               "Saffron"
+          ],
+          "benefits": "Removes tan, brightens skin",
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": "Tan Removal",
+          "allergens": null,
+          "sensitivities": "Sensitive to Turmeric"
+     },
+     {
+          "id": 8,
+          "name": "Mamaearth Onion Hair Oil for Hair Regrowth & Hair Fall Control",
+          "brand": "Mamaearth",
+          "category": "Hair Oil",
+          "price": 4399.2,
+          "ingredients": [
+               "Onion",
+               "Bhringraj"
+          ],
+          "key_ingredients": [
+               "Onion",
+               "Bhringraj"
+          ],
+          "benefits": "Promotes hair regrowth, reduces hair fall",
+          "side_effects": "Strong smell",
+          "is_natural": 1,
+          "concentrations": "High",
+          "usage": "Twice a week",
+          "application_tips": "Massage on scalp, leave overnight",
+          "skin_types": "All Hair Types",
+          "skin_concerns": [
+               "Hair Fall",
+               "Regrowth"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Onion"
+     },
+     {
+          "id": 9,
+          "name": "Mamaearth Ubtan Foaming Face Wash with Turmeric and Saffron",
+          "brand": "Mamaearth",
+          "category": "Face Wash",
+          "price": 3938.6,
+          "ingredients": [
+               "Turmeric",
+               "Saffron"
+          ],
+          "key_ingredients": [
+               "Turmeric",
+               "Saffron"
+          ],
+          "benefits": "Removes tan, deep cleanses",
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": "Tan Removal",
+          "allergens": null,
+          "sensitivities": "Sensitive to Turmeric"
+     },
+     {
+          "id": 10,
+          "name": "Neutrogena Oil-Free Acne Face Wash Cream Cleanser 200ml",
+          "brand": "Neutrogena",
+          "category": "Face Wash",
+          "price": 10264.8,
+          "ingredients": [
+               "Salicylic Acid"
+          ],
+          "key_ingredients": [
+               "Salicylic Acid"
+          ],
+          "benefits": "Treats acne, prevents breakouts",
+          "side_effects": "Dryness in some cases",
+          "is_natural": 0,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Acne-Prone Skin",
+          "skin_concerns": [
+               "Acne",
+               "Breakouts"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Salicylic Acid"
+     },
+     {
+          "id": 11,
+          "name": "Neutrogena Hydro Boost Water Gel 50g",
+          "brand": "Neutrogena",
+          "category": "Moisturizer",
+          "price": 4500.0,
+          "ingredients": [
+               "Hyaluronic Acid"
+          ],
+          "key_ingredients": [
+               "Hyaluronic Acid"
+          ],
+          "benefits": [
+               "Hydrates skin",
+               "improves moisture barrier"
+          ],
+          "side_effects": "May cause breakouts for oily skin",
+          "is_natural": 0,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply evenly to face and neck",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dryness",
+               "Dehydration"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Hyaluronic Acid"
+     },
+     {
+          "id": 11,
+          "name": "St. Ives Fresh Skin Apricot Scrub 170g",
+          "brand": "St. Ives",
+          "category": "Scrub",
+          "price": 9977.0,
+          "ingredients": [
+               "Apricot",
+               "Walnut"
+          ],
+          "key_ingredients": [
+               "Apricot",
+               "Walnut"
+          ],
+          "benefits": [
+               "Exfoliates",
+               "smoothens skin"
+          ],
+          "side_effects": "Can be harsh on sensitive skin",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Weekly",
+          "application_tips": "Massage on face for 2-3 minutes, rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Rough Texture"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Walnut"
+     },
+     {
+          "id": 12,
+          "name": "L'Oréal Paris Revitalift Hyaluronic Acid Serum",
+          "brand": "L'Oréal",
+          "category": "Serum",
+          "price": 11452.8,
+          "ingredients": [
+               "Hyaluronic Acid"
+          ],
+          "key_ingredients": [
+               "Hyaluronic Acid"
+          ],
+          "benefits": [
+               "Hydrates",
+               "plumps skin"
+          ],
+          "side_effects": null,
+          "is_natural": 0,
+          "concentrations": "High",
+          "usage": "Twice daily",
+          "application_tips": "Apply a few drops to face, massage gently",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dryness",
+               "Fine Lines"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Hyaluronic Acid"
+     },
+     {
+          "id": 13,
+          "name": "Junsui Naturals Face Wash With Extra Whitening Radiance 100g",
+          "brand": "Junsui",
+          "category": "Face Wash",
+          "price": 1217.3,
+          "ingredients": [
+               "Herbal extracts"
+          ],
+          "key_ingredients": [
+               "Herbal extracts"
+          ],
+          "benefits": [
+               "Whitens skin",
+               "adds radiance"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Pigmentation"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to herbal extracts"
+     },
+     {
+          "id": 14,
+          "name": "OxyGlow Saffron Whitening Lotion 120ml",
+          "brand": "OxyGlow",
+          "category": "Lotion",
+          "price": 2150.0,
+          "ingredients": [
+               "Saffron",
+               "Milk Proteins"
+          ],
+          "key_ingredients": [
+               "Saffron",
+               "Milk Proteins"
+          ],
+          "benefits": [
+               "Whitens skin",
+               "moisturizes"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to body, massage gently",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Dry Skin"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Saffron"
+     },
+     {
+          "id": 15,
+          "name": "OxyGlow Liquorice Mud Pack 100g",
+          "brand": "OxyGlow",
+          "category": "Mask",
+          "price": 1650.0,
+          "ingredients": [
+               "Liquorice",
+               "Mud"
+          ],
+          "key_ingredients": [
+               "Liquorice",
+               "Mud"
+          ],
+          "benefits": [
+               "Detoxifies skin",
+               "brightens"
+          ],
+          "side_effects": "Possible irritation",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Weekly",
+          "application_tips": "Apply evenly, let dry, rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Oiliness"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Liquorice"
+     },
+     {
+          "id": 16,
+          "name": "OxyGlow Cucumber Skin Toner 100ml",
+          "brand": "OxyGlow",
+          "category": "Toner",
+          "price": 1300.0,
+          "ingredients": [
+               "Cucumber",
+               "Aloe Vera"
+          ],
+          "key_ingredients": [
+               "Cucumber",
+               "Aloe Vera"
+          ],
+          "benefits": [
+               "Refreshes",
+               "hydrates skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Twice daily",
+          "application_tips": "Apply with cotton pad, avoid eyes",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Dryness"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 17,
+          "name": "OxyGlow Rose Refreshing Toner 100ml",
+          "brand": "OxyGlow",
+          "category": "Toner",
+          "price": 1300.0,
+          "ingredients": [
+               "Rose",
+               "Witch Hazel"
+          ],
+          "key_ingredients": [
+               "Rose",
+               "Witch Hazel"
+          ],
+          "benefits": [
+               "Soothes",
+               "refreshes skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Twice daily",
+          "application_tips": "Apply with cotton pad, avoid eyes",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Redness"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 18,
+          "name": "OxyGlow Charcoal Face Wash 100ml",
+          "brand": "OxyGlow",
+          "category": "Face Wash",
+          "price": 1970.0,
+          "ingredients": [
+               "Charcoal",
+               "Aloe Vera"
+          ],
+          "key_ingredients": [
+               "Charcoal",
+               "Aloe Vera"
+          ],
+          "benefits": [
+               "Deep cleanses",
+               "detoxifies skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Oily Skin",
+          "skin_concerns": [
+               "Oiliness",
+               "Acne"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 19,
+          "name": "OxyGlow Pearl Whitening Face Wash 100ml",
+          "brand": "OxyGlow",
+          "category": "Face Wash",
+          "price": 1750.0,
+          "ingredients": [
+               "Pearl",
+               "Mulberry"
+          ],
+          "key_ingredients": [
+               "Pearl",
+               "Mulberry"
+          ],
+          "benefits": [
+               "Whitens",
+               "brightens skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Pigmentation"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 20,
+          "name": "OxyGlow Gold & Saffron Face Wash 100ml",
+          "brand": "OxyGlow",
+          "category": "Face Wash",
+          "price": 1885.0,
+          "ingredients": [
+               "Gold",
+               "Saffron"
+          ],
+          "key_ingredients": [
+               "Gold",
+               "Saffron"
+          ],
+          "benefits": [
+               "Brightens",
+               "rejuvenates skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Aging"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 21,
+          "name": "Jovees Tea Tree Oil Balance Face Wash 120ml",
+          "brand": "Jovees",
+          "category": "Face Wash",
+          "price": 2330.0,
+          "ingredients": [
+               "Tea Tree Oil",
+               "Neem"
+          ],
+          "key_ingredients": [
+               "Tea Tree Oil",
+               "Neem"
+          ],
+          "benefits": [
+               "Controls oil",
+               "treats acne"
+          ],
+          "side_effects": "Possible dryness",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Oily Skin",
+          "skin_concerns": [
+               "Oiliness",
+               "Acne"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Tea Tree Oil"
+     },
+     {
+          "id": 22,
+          "name": "Jovees Grape Face Wash for a Brighter & Glowing Skin 120ml",
+          "brand": "Jovees",
+          "category": "Face Wash",
+          "price": 1865.0,
+          "ingredients": [
+               "Grape Extract",
+               "Aloe"
+          ],
+          "key_ingredients": [
+               "Grape Extract",
+               "Aloe"
+          ],
+          "benefits": [
+               "Brightens",
+               "hydrates skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Dryness"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 23,
+          "name": "Jovees Strawberry Face Wash for Sheer Moisture & Glowing Skin 120ml",
+          "brand": "Jovees",
+          "category": "Face Wash",
+          "price": 1710.0,
+          "ingredients": [
+               "Strawberry",
+               "Aloe Vera"
+          ],
+          "key_ingredients": [
+               "Strawberry",
+               "Aloe Vera"
+          ],
+          "benefits": [
+               "Moisturizes",
+               "brightens skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Dryness"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 24,
+          "name": "Prevense Neem Face Wash for Oil & Acne Prone Skin 100ml",
+          "brand": "Prevense",
+          "category": "Face Wash",
+          "price": 1150.0,
+          "ingredients": [
+               "Neem",
+               "Aloe Vera"
+          ],
+          "key_ingredients": [
+               "Neem",
+               "Aloe Vera"
+          ],
+          "benefits": [
+               "Controls oil",
+               "treats acne"
+          ],
+          "side_effects": "Possible dryness",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Oily Skin",
+          "skin_concerns": [
+               "Oiliness",
+               "Acne"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Neem"
+     },
+     {
+          "id": 25,
+          "name": "Himalaya Oil Clear Lemon Face Wash 100ml",
+          "brand": "Himalaya",
+          "category": "Face Wash",
+          "price": 1391.2,
+          "ingredients": [
+               "Lemon",
+               "Honey"
+          ],
+          "key_ingredients": [
+               "Lemon",
+               "Honey"
+          ],
+          "benefits": [
+               "Clears oil",
+               "brightens skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Oily Skin",
+          "skin_concerns": [
+               "Oiliness",
+               "Dullness"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 26,
+          "name": "Tea Tree Moisturising Treatment Pack",
+          "brand": "Tea Tree",
+          "category": "Treatment",
+          "price": 4760.0,
+          "ingredients": [
+               "Tea Tree Oil"
+          ],
+          "key_ingredients": [
+               "Tea Tree Oil"
+          ],
+          "benefits": [
+               "Moisturizes",
+               "treats acne"
+          ],
+          "side_effects": "Possible dryness",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Weekly",
+          "application_tips": "Apply to cleansed face, leave on",
+          "skin_types": [
+               "Oily",
+               "Acne-Prone"
+          ],
+          "skin_concerns": [
+               "Acne",
+               "Dryness"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Tea Tree Oil"
+     },
+     {
+          "id": 27,
+          "name": "Tea Tree Facial Scrub",
+          "brand": "Tea Tree",
+          "category": "Scrub",
+          "price": 2210.0,
+          "ingredients": [
+               "Tea Tree Oil"
+          ],
+          "key_ingredients": [
+               "Tea Tree Oil"
+          ],
+          "benefits": [
+               "Exfoliates",
+               "treats acne"
+          ],
+          "side_effects": "Possible dryness",
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Weekly",
+          "application_tips": "Gently massage on wet face, rinse",
+          "skin_types": [
+               "Oily",
+               "Acne-Prone"
+          ],
+          "skin_concerns": [
+               "Acne",
+               "Dullness"
+          ],
+          "allergens": null,
+          "sensitivities": "Sensitive to Tea Tree Oil"
+     },
+     {
+          "id": 28,
+          "name": "Prevense Fair Intense 1 For All Skin Types 50ml",
+          "brand": "Prevense",
+          "category": "Cream",
+          "price": 3250.0,
+          "ingredients": [
+               "Fairness Agents"
+          ],
+          "key_ingredients": [
+               "Fairness Agents"
+          ],
+          "benefits": [
+               "Evens skin tone",
+               "brightens"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply evenly on cleansed face",
+          "skin_types": "All Skin Types",
+          "skin_concerns": "Uneven Skin Tone",
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 29,
+          "name": "Prevense Fair Intense 2 For All Skin Types 50ml",
+          "brand": "Prevense",
+          "category": "Cream",
+          "price": 2115.0,
+          "ingredients": [
+               "Fairness Agents"
+          ],
+          "key_ingredients": [
+               "Fairness Agents"
+          ],
+          "benefits": [
+               "Evens skin tone",
+               "brightens"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply evenly on cleansed face",
+          "skin_types": "All Skin Types",
+          "skin_concerns": "Uneven Skin Tone",
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 30,
+          "name": "Prevense Cleanser for All Skin Types 120ml",
+          "brand": "Prevense",
+          "category": "Cleanser",
+          "price": 825.0,
+          "ingredients": [
+               "Cleansing Agents"
+          ],
+          "key_ingredients": [
+               "Cleansing Agents"
+          ],
+          "benefits": [
+               "Cleanses",
+               "refreshes skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "All Skin Types",
+          "skin_concerns": [
+               "Dullness",
+               "Oiliness"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     },
+     {
+          "id": 31,
+          "name": "Prevense Grape Seed & Jojoba Facial Wash For Sensitive Skin 120ml",
+          "brand": "Prevense",
+          "category": "Face Wash",
+          "price": 990.0,
+          "ingredients": [
+               "Grape Seed",
+               "Jojoba"
+          ],
+          "key_ingredients": [
+               "Grape Seed",
+               "Jojoba"
+          ],
+          "benefits": [
+               "Nourishes",
+               "soothes sensitive skin"
+          ],
+          "side_effects": null,
+          "is_natural": 1,
+          "concentrations": "Standard",
+          "usage": "Daily",
+          "application_tips": "Apply to wet face, lather and rinse",
+          "skin_types": "Sensitive Skin",
+          "skin_concerns": [
+               "Dryness",
+               "Sensitivity"
+          ],
+          "allergens": null,
+          "sensitivities": null
+     }
+]

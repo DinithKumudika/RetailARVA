@@ -8,6 +8,8 @@ from langchain_qdrant import QdrantVectorStore
 from langchain_core.prompts import PromptTemplate
 from langchain.docstore.document import Document
 from langchain_core.runnables.base import RunnableSerializable
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_document_chain
 from utils import prompts
 from enum import Enum
 from uuid import uuid4, UUID

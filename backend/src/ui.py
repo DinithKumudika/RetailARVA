@@ -5,8 +5,15 @@ from utils.vector_db import VectorDb
 from utils.chatbot import Chatbot, OutputParserTypes
 from langchain_core.messages import HumanMessage, AIMessage
 from configs.database import Database
+import os
 
 env = dotenv_values("../.env")
+
+os.environ["LANGCHAIN_TRACING_V2"] = env.get('LANGCHAIN_TRACING_V2')
+os.environ["LANGCHAIN_ENDPOINT"] = env.get('LANGCHAIN_ENDPOINT')
+os.environ["LANGCHAIN_API_KEY"] = env.get('LANGCHAIN_API_KEY')
+os.environ["LANGCHAIN_PROJECT"] = env.get('LANGCHAIN_PROJECT')
+
 
 def qdrant_init():
     qdrant = VectorDb(
