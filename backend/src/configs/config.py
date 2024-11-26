@@ -10,6 +10,9 @@ class DevConfig(Config):
     TESTING = True
     DATABASE_URL = env.get('DATABASE_URL')
     GRADIO_URL = env.get('GRADIO_URL')
+    NGROK_AUTH_TOKEN = env.get('NGROK_AUTH_TOKEN')
+    NGROK_STATIC_DOMAIN = env.get('NGROK_STATIC_DOMAIN')
+    NGROK_API_KEY = env.get('NGROK_API_KEY')
 
 class QdrantConfig(Config):
     QDRANT_URL = env.get('QDRANT_CLUSTER_URL')

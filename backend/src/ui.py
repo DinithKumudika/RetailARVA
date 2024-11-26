@@ -5,6 +5,7 @@ from utils.vector_db import VectorDb
 from utils.chatbot import Chatbot, OutputParserTypes
 from langchain_core.messages import HumanMessage, AIMessage
 from configs.database import Database
+from utils.rag_pipeline import RagPipeline
 import os
 
 env = dotenv_values("../.env")
@@ -31,27 +32,36 @@ def db_init():
 
 def chat_init():
     db = db_init()
-    gemini_chat = Chatbot(db)
-    gemini_chat.set_parser(OutputParserTypes.STRING)
+    chatbot = Chatbot(db)
+    chatbot.set_parser(OutputParserTypes.STRING)
     
     qdrant = qdrant_init()
-    gemini_chat.set_vector_store(qdrant.get_collection("products"))
-    return gemini_chat
+    chatbot.set_vector_store(qdrant.get_collection("products"))
+    return chatbot
 
-gemini_chat = chat_init()
+chatbot = chat_init()
 
 def greet_user():
-    greeting = gemini_chat.greet()
+    greeting = chatbot.greet()
     return greeting
 
+rag_pipeline = RagPipeline(
+    chatbot.vector_store,
+    search_k=3,
+    model=chatbot.model
+)
 
-def chat_fucntion(message, history: list):
-    chat_response = gemini_chat.invoke(message)
+rag_pipeline.set_history_aware_retriever()
+rag_pipeline.set_qa_chain()
+rag_pipeline.set_rag_chain()
 
+
+def chat_function(message, history: list):
+    chat_response = chatbot.invoke(message, rag_pipeline)
     return chat_response
 
 gr.ChatInterface(
-    fn=chat_fucntion,
+    fn=chat_function,
     title="RetailARVA Bot",
     chatbot=gr.Chatbot(height=500, value=[[None, greet_user()]]),
     textbox=gr.Textbox(placeholder="Message chatbot", container=False, scale=7),

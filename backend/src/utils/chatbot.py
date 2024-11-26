@@ -1,18 +1,14 @@
 from typing import List
 import langchain 
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain.schema.runnable import RunnablePassthrough
 from langchain_qdrant import QdrantVectorStore
 from langchain_core.prompts import PromptTemplate
 from langchain.docstore.document import Document
 from langchain_core.runnables.base import RunnableSerializable
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_document_chain
+from utils.rag_pipeline import RagPipeline
 from utils import prompts
 from enum import Enum
-from uuid import uuid4, UUID
 from utils.rag_helper import RagHelper
 from enums import ChatMessageRole
 from repositories.message_repository import MessageRepository
@@ -40,18 +36,7 @@ class Chatbot:
         self.chat_repo = ChatRepository(db)
         self.session_id = None
         self.formatted_message_history: None | List = None
-
-    def get_session_history(self, session_id: int) -> list:
-        chat_messages = self.message_store.get_by_chat_id(session_id)
-        
-        if not chat_messages:
-            chat = self.chat_repo.add_single()
-            return self.message_store.get_by_chat_id(chat.chat_id)
-        else:
-            return chat_messages
-        # if session_id not in session_store:
-        #     session_store[session_id] = InMemoryChatMessageHistory()
-        # return session_store[session_id]
+        self.chat_history = []
     
     def serialize_message(self, message):
         if isinstance(message, HumanMessage):
@@ -63,9 +48,9 @@ class Chatbot:
     
     def add_message_to_history(self, message : str, role: ChatRoles):
         if role.name == ChatRoles.ASSISTANT:
-            self.chatHistory.append(AIMessage(content=message))
+            self.chat_history.extend(AIMessage(content=message))
         elif role.name == ChatRoles.USER:
-            self.chatHistory.append(HumanMessage(content=message))
+            self.chat_history.extend(HumanMessage(content=message))
 
     def set_parser(self, parser: OutputParserTypes) -> None:
         if parser == OutputParserTypes.STRING:
@@ -73,9 +58,6 @@ class Chatbot:
 
     def set_vector_store(self, vector_store : QdrantVectorStore):
         self.vector_store = vector_store
-    
-    def create_new_session(self) -> UUID:
-        return uuid4()
     
     def format_docs(self, docs : List[Document]):
         return "\n\n".join(doc.page_content for doc in docs)
@@ -100,82 +82,21 @@ class Chatbot:
         return messages
     
     def greet(self) -> str:
-        # prompt = ChatPromptTemplate.from_messages(
-        #     [
-        #         SystemMessage(content=f"{Prompts.system_prompt}\n{Prompts.greet_prompt}"),
-        #     ]
-        # )
-        self.session_id = 1
-        chat_session = self.get_session_history(session_id=self.session_id)
-        
         prompt = PromptTemplate.from_template(f"{prompts.system_prompt}\n{prompts.greet_prompt}")
         llm_chain : RunnableSerializable = prompt | self.model | self.parser
 
         response = llm_chain.invoke({})
-        
-        self.message_store.add_single(
-            chat_id=self.session_id, 
-            role=ChatMessageRole.ASSISTANT, 
-            content=response
-        )
-
+        self.add_message_to_history(response, ChatMessageRole.ASSISTANT)
         return response
 
     
-    def invoke(self, query: str) -> str:
-        self.message_store.add_single(
-            chat_id=self.session_id, 
-            role=ChatMessageRole.USER, 
-            content=query
-        )
-        
-        chat_session = self.get_session_history(self.session_id)
-        self.print_chat_history(chat_session)
-        formatted_messages = self.format_to_message_history(chat_session)
-        print(f"length of chat history: {len(formatted_messages)}")
-        
+    def invoke(self, query: str, rag_pipeline: RagPipeline) -> str:
         try:
-            retriever = self.vector_store.as_retriever(search_type="similarity_score_threshold", search_kwargs={"k": 2, "score_threshold": 0.5})
+            response = rag_pipeline.invoke(query, self.chat_history)
             
-            docs = retriever.invoke(input=query)
-            formatted_context = self.format_docs(docs)
+            self.add_message_to_history(query, ChatMessageRole.USER)
+            self.add_message_to_history(response, ChatMessageRole.ASSISTANT)
             
-            print(f"retrieved Context: \n {formatted_context}")
-            
-            rag_prompt = ChatPromptTemplate.from_messages(
-                [
-                    SystemMessage(content=f"{prompts.system_prompt}"),
-                    HumanMessagePromptTemplate(
-                        prompt=PromptTemplate(
-                            template=prompts.qa_system_prompt_updated,
-                            input_variables=["context", "question", "chat_history"]
-                        )
-                    )
-                ]
-            )
-            
-            # Render and print the RAG prompt
-            formatted_rag_prompt = rag_prompt.format(
-                chat_history=formatted_messages, 
-                question=query,
-                context=formatted_context
-            )
-            print(f"RAG Prompt: \n{formatted_rag_prompt}")
-            print("\nEnd of RAG Prompt\n")
-
-            rag_chain = rag_prompt | self.model | self.parser
-
-            response = rag_chain.invoke({"question": query, "chat_history": formatted_messages, "context": formatted_context})
-            
-            print(f"bot response: {response}")
-            
-            self.message_store.add_single(
-                chat_id=self.session_id, 
-                role=ChatMessageRole.ASSISTANT, 
-                content=response
-            )
-
             return response
-            
         except Exception as e:
             raise

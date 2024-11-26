@@ -2,9 +2,11 @@ from dotenv import dotenv_values
 from flask import Flask, g
 from configs.database import Database
 from configs.config import DevConfig, QdrantConfig, GradioConfig, GoogleConfig
+from utils.rag_pipeline import RagPipeline
 from utils.chatbot import Chatbot, OutputParserTypes
 from utils.database import create_all, is_database_created
 from utils.vector_db import VectorDb
+import ngrok
 
 def create_app():
     app = Flask(__name__)
@@ -16,7 +18,11 @@ def create_app():
     app.config.from_object(GradioConfig)
 
     db = Database(app.config.get('DATABASE_URL'))
-    db.connect()
+    
+    try:
+        db.connect()
+    except Exception as e:
+        app.logger.error(f"Database connection failed: {e}")
 
     def get_db() -> Database:
         if 'db' not in g:
@@ -26,30 +32,50 @@ def create_app():
     if is_database_created(db) == False:
         create_all(db)
 
-    qdrant = VectorDb(
-        env.get('QDRANT_CLUSTER_URL'), 
-        env.get('QDRANT_API_KEY')
-    )
-    qdrant.set_embedding_model()
+    try:
+        qdrant = VectorDb(
+            env.get('QDRANT_CLUSTER_URL'), 
+            env.get('QDRANT_API_KEY')
+        )
+        qdrant.set_embedding_model()
+    except Exception as e:
+        app.logger.error(f"Failed to initialize Qdrant: {e}")
+        raise
 
     def get_qdrant() -> VectorDb:
         if 'qdrant' not in g:
             g.qdrant = qdrant
         return g.qdrant
     
-    def get_gemini_chat():
+    def get_chat():
         if 'chat' not in g:
-            gemini_chat = Chatbot(model_id="llama3.1")
-            gemini_chat.set_parser(OutputParserTypes.STRING)
-            gemini_chat.set_vector_store(app.config['QDRANT']().get_collection("products"))
-            g.chat = gemini_chat
+            db = app.config['DB']()
+            chat = Chatbot(db)
+            chat.set_parser(OutputParserTypes.STRING)
+            qdrant = app.config['QDRANT']()
+            chat.set_vector_store(qdrant.get_collection("products"))
+            g.chat = chat
         return g.chat
+    
+    def get_rag_pipeline():
+        if 'rag_pipeline' not in g:
+            chat = app.config['CHAT']()
+            rag_pipeline = RagPipeline(
+                chat.vector_store,
+                search_k=3,
+                model=chat.model
+            )
+            rag_pipeline.set_history_aware_retriever()
+            rag_pipeline.set_qa_chain()
+            rag_pipeline.set_rag_chain()
+            g.rag_pipeline = rag_pipeline
+        return g.rag_pipeline
 
     @app.teardown_appcontext
     def teardown_db(exception):
         db = g.pop('db', None)
         if db is not None:
-            db.close()
+            pass
 
     @app.teardown_appcontext
     def teardown_qdrant(exception):
@@ -69,7 +95,8 @@ def create_app():
     
     app.config['DB'] = get_db
     app.config['QDRANT'] = get_qdrant
-    app.config['CHAT'] = get_gemini_chat
+    app.config['CHAT'] = get_chat
+    app.config['RAG_PIPELINE'] = get_rag_pipeline
 
     with app.app_context():
         app.register_blueprint(api_bp, url_prefix="/api")
