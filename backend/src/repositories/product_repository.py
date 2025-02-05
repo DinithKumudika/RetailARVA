@@ -8,3 +8,6 @@ class ProductRepository:
 
     def fetch_all(self):
         return self.session.query(Product).all()
+    
+    def fetch_by_id(self, product_id: int):
+        return self.session.query(Product).filter_by(id=product_id).first()

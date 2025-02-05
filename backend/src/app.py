@@ -1,21 +1,29 @@
 from dotenv import dotenv_values
 from flask import Flask, g
 from configs.database import Database
-from configs.config import DevConfig, QdrantConfig, GradioConfig, GoogleConfig
+from configs.config import DevConfig, QdrantConfig, GradioConfig, GoogleConfig, LangsmithConfig
 from utils.rag_pipeline import RagPipeline
 from utils.chatbot import Chatbot, OutputParserTypes
 from utils.database import create_all, is_database_created
 from utils.vector_db import VectorDb
 import ngrok
+import os
 
 def create_app():
     app = Flask(__name__)
-
+    
+    # set app configurations
     env = dotenv_values("../.env")
     app.config.from_object(DevConfig)
     app.config.from_object(GoogleConfig)
     app.config.from_object(QdrantConfig)
     app.config.from_object(GradioConfig)
+    app.config.from_object(LangsmithConfig)
+    
+    os.environ["LANGCHAIN_TRACING_V2"] = app.config.get('LANGCHAIN_TRACING_V2')
+    os.environ["LANGCHAIN_API_KEY"] = app.config.get('LANGCHAIN_API_KEY')
+    os.environ["LANGCHAIN_ENDPOINT"] = app.config.get('LANGCHAIN_ENDPOINT')
+    os.environ["LANGCHAIN_PROJECT"] = app.config.get('LANGCHAIN_PROJECT')
 
     db = Database(app.config.get('DATABASE_URL'))
     

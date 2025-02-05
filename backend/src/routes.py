@@ -26,6 +26,24 @@ def redirect_to_gradio():
     return redirect(app.config.get('GRADIO_URL'), code=302)
 
 
+@api_bp.route("/products/<product_id>", methods=['GET'])
+def get_by_id(product_id: int):
+    if product_id:
+        product_repo = ProductRepository(app.config['DB']())
+        product = product_repo.fetch_by_id(product_id)
+        response = make_response(jsonify({
+            "data" : product.to_dict()
+        }))
+        response.status_code = 200
+    else:
+        response = make_response(jsonify({
+            "error" : "no product found with the given id"
+        }))
+        response.status_code = 404
+        
+    response.headers['content-type'] = 'application/json'
+    return response
+
 @api_bp.route("/chat", methods=['POST'])
 def chat_with_assistant():
     chat = app.config['CHAT']()

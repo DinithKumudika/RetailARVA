@@ -5,7 +5,7 @@ class Config:
     """Base config."""
 
 class DevConfig(Config):
-    FLASK_ENV = 'development'
+    FLASK_ENV = env.get('FLASK_ENV')
     DEBUG = True
     TESTING = True
     DATABASE_URL = env.get('DATABASE_URL')
@@ -24,3 +24,9 @@ class GradioConfig(Config):
 
 class GoogleConfig(Config):
     GOOGLE_GENERATIVE_LANGUAGE_API_KEY= env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY')
+    
+class LangsmithConfig(Config):
+    LANGCHAIN_TRACING_V2 = env.get('LANGCHAIN_TRACING_V2')
+    LANGCHAIN_ENDPOINT = env.get('LANGCHAIN_ENDPOINT')
+    LANGCHAIN_API_KEY = env.get('LANGCHAIN_API_KEY')
+    LANGCHAIN_PROJECT = env.get('LANGCHAIN_PROJECT')

@@ -43,6 +43,12 @@ class Product(Base):
         self.skin_concerns = skin_concerns
         self.allergens = allergens
         self.sensitivities = sensitivities
+    
+    def to_dict(self):
+        """
+        Converts the SQLAlchemy model instance into a dictionary.
+        """
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 class CustomerReview(Base):
     __tablename__ = "customer_reviews"

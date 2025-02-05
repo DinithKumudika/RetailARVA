@@ -9,6 +9,7 @@ from langchain.prompts import PromptTemplate
 from langchain_community.document_transformers import (
      LongContextReorder
 )
+from markdownify import markdownify as md
 
 from utils.prompts import contextualize_q_system_prompt, system_prompt, qa_system_prompt, query_expansion_prompt
 from utils.parsers import QuestionArrayOutputParser
@@ -37,6 +38,9 @@ class RagPipeline:
                self.retriever,
                contextualize_q_prompt
           )
+          
+     def remove_markdown(self, response: str) -> str:
+          return md(response)
           
      def set_qa_chain(self):
           
@@ -69,6 +73,10 @@ class RagPipeline:
      def invoke(self, query: str, chat_history: list):
           queries = self.expand_query(query)
           docs = [self.retriever.invoke(input=query) for query in queries]
+          
+          for sublist in docs:
+               for doc in sublist:
+                    print(doc.metadata)
           
           # Remove duplicate retrievals
 
@@ -111,4 +119,4 @@ class RagPipeline:
                "chat_history": chat_history
           })
           
-          return response
+          return self.remove_markdown(response)
