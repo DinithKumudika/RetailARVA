@@ -1,0 +1,52 @@
+t=2024-12-16T11:21:34+0530 lvl=info msg="no configuration paths supplied"
+t=2024-12-16T11:21:34+0530 lvl=info msg="using configuration at default config path" path=C:\\Users\\Dinith\\AppData\\Local/ngrok/ngrok.yml
+t=2024-12-16T11:21:34+0530 lvl=info msg="open config file" path=C:\\Users\\Dinith\\AppData\\Local\\ngrok\\ngrok.yml err=nil
+t=2024-12-16T11:21:34+0530 lvl=warn msg="can't bind default web address, trying alternatives" obj=web addr=127.0.0.1:4040
+t=2024-12-16T11:21:34+0530 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4041 allow_hosts=[]
+t=2024-12-16T11:21:35+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="authentication failed: Your account is limited to 1 simultaneous ngrok agent sessions.\nYou can run multiple simultaneous tunnels from a single agent session by defining the tunnels in your agent=2024-12-16T11:21:45+0530 lvl=info msg="join connections" obj=join id=7cffba652b40 l=127.0.0.1:11434 r=103.247.50.179:55845
+t=2024-12-16T11:23:48+0530 lvl=info msg="join connections" obj=join id=7168c9da0af5 l=127.0.0.1:11434 r=[2402:d000:a400:add9:1d81:b53e:e0eb:e9b6]:36000
+t=2024-12-16T13:28:20+0530 lvl=info msg="join connections" obj=join id=d0cc479cd60b l=127.0.0.1:11434 r=103.247.50.179:53833
+t=2024-12-16T13:32:38+0530 lvl=info msg="join connections" obj=join id=8e6c1b2fd1b8 l=127.0.0.1:11434 r=103.247.50.179:53910
+t=2024-12-16T13:36:44+0530 lvl=info msg="join connections" obj=join id=327a42ac2ed2 l=127.0.0.1:11434 r=103.247.50.179:53937
+t=2024-12-16T13:49:35+0530 lvl=info msg="join connections" obj=join id=4e6cebb86794 l=127.0.0.1:11434 r=103.247.50.179:54881
+t=2024-12-16T13:52:13+0530 lvl=info msg="join connections" obj=join id=64e648dd9639 l=127.0.0.1:11434 r=103.247.50.179:54906
+t=2024-12-16T13:53:32+0530 lvl=info msg="join connections" obj=join id=2a66130be2d8 l=127.0.0.1:11434 r=103.247.50.179:54913
+t=2024-12-16T13:54:39+0530 lvl=info msg="join connections" obj=join id=dddd98b69030 l=127.0.0.1:11434 r=103.247.50.179:54931
+t=2024-12-16T13:58:13+0530 lvl=info msg="join connections" obj=join id=0623b6d216e1 l=127.0.0.1:11434 r=103.247.50.179:54950
+t=2024-12-16T14:02:09+0530 lvl=info msg="join connections" obj=join id=1b3b1cc70a58 l=127.0.0.1:11434 r=103.247.50.179:54968
+t=2024-12-16T14:04:27+0530 lvl=info msg="join connections" obj=join id=b0fd53d3bfd2 l=127.0.0.1:11434 r=103.247.50.179:54985
+t=2024-12-16T14:07:51+0530 lvl=info msg="join connections" obj=join id=a09b0868eadb l=127.0.0.1:11434 r=103.247.50.179:55003
+t=2024-12-16T14:10:45+0530 lvl=info msg="join connections" obj=join id=04d78399d34f l=127.0.0.1:11434 r=103.247.50.179:55015
+t=2024-12-16T14:15:07+0530 lvl=info msg="join connections" obj=join id=adbedd056321 l=127.0.0.1:11434 r=103.247.50.179:55042
+t=2024-12-16T14:17:10+0530 lvl=info msg="join connections" obj=join id=63ba55586b2c l=127.0.0.1:11434 r=103.247.50.179:55051
+t=2024-12-16T14:22:25+0530 lvl=info msg="join connections" obj=join id=146c4c14200b l=127.0.0.1:11434 r=103.247.50.179:55072
+t=2024-12-16T14:27:10+0530 lvl=info msg="join connections" obj=join id=1726bcd957c6 l=127.0.0.1:11434 r=103.247.50.179:55094
+t=2024-12-16T14:29:04+0530 lvl=info msg="join connections" obj=join id=6f1ca1509854 l=127.0.0.1:11434 r=103.247.50.179:55108
+t=2024-12-16T14:32:46+0530 lvl=info msg="join connections" obj=join id=9590c1f4a292 l=127.0.0.1:11434 r=103.247.50.179:55130
+t=2024-12-16T14:34:39+0530 lvl=info msg="join connections" obj=join id=247a05bb5473 l=127.0.0.1:11434 r=103.247.50.179:55146
+t=2024-12-16T14:35:36+0530 lvl=info msg="join connections" obj=join id=7994a9cc9614 l=127.0.0.1:11434 r=103.247.50.179:55152
+t=2024-12-16T17:15:31+0530 lvl=info msg="update available" obj=updater
+t=2024-12-16T17:18:05+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=c45935e20d8f err="read EOF from remote peer"
+t=2024-12-16T17:18:06+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2024-12-16T17:18:06+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2024-12-16T17:18:30+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=5bfc8cc3b8a7 clientid=5da01abaaf31304b076032878e1fb46d
+t=2024-12-16T17:21:50+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=c45935e20d8f err="read EOF from remote peer"
+t=2024-12-16T17:21:55+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2024-12-16T17:21:55+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2024-12-16T17:22:15+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=e787512ca6c9 clientid=5da01abaaf31304b076032878e1fb46d
+t=2024-12-16T17:25:07+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=c45935e20d8f err="read tcp 192.168.100.134:55530->13.232.27.141:443: wsarecv: An established connection was aborted by the software in your host machine."
+t=2024-12-16T17:25:07+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:25:08+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:25:09+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:25:11+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:25:15+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:25:23+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:25:28+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=834819c547b8 clientid=5da01abaaf31304b076032878e1fb46d
+t=2024-12-16T17:25:39+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:26:09+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:26:39+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:27:09+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:27:39+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:28:09+0530 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp: lookup connect.ngrok-agent.com: no such host"
+t=2024-12-16T17:28:40+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2024-12-16T17:28:40+0530 lvl=info msg="tunnel session started" obj=tunnels.session
