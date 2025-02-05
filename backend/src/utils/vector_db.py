@@ -1,9 +1,7 @@
 from typing import List
 from langchain_qdrant import QdrantVectorStore, RetrievalMode
 from langchain.docstore.document import Document
-from qdrant_client import QdrantClient
-# from langchain_ollama import OllamaEmbeddings
-from rag_helper import RagHelper
+from utils.rag_helper import RagHelper
 
 class VectorDb:
     def __init__(self, url : str, api_key : str) -> None:
@@ -19,6 +17,10 @@ class VectorDb:
     #         embedding=self.embeddings
     #     )
     #     return self.vector_store
+    
+    def set_embedding_model(self):
+        rag_helper = RagHelper()
+        self.embeddings = rag_helper.get_embedding_model()
 
     def get_collection(self, collection: str) -> QdrantVectorStore:
         self.vector_store = QdrantVectorStore.from_existing_collection(
@@ -29,10 +31,6 @@ class VectorDb:
             prefer_grpc=True
         )
         return self.vector_store
-    
-    def set_embedding_model(self):
-        self.embeddings = RagHelper().get_embedding_model()
-        print(self.embeddings)
     
     def embed_documents(self, docs : List[Document], collection: str) -> QdrantVectorStore:
         qdrant = QdrantVectorStore.from_documents(

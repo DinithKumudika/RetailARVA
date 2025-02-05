@@ -10,20 +10,24 @@ env = dotenv_values("../.env")
 
 class RagHelper:
     def __init__(self) -> None:
-        if env.get('USE_OLLAMA') == True:
+        self.model = None
+        self.embeddings = None
+        
+        if eval(env.get('USE_OLLAMA')) == True:
+            print("using ollama model...")
             self.model = ChatOllama(
                 base_url=env.get('OLLAMA_URL'),
                 model=env.get('OLLAMA_MODEL_ID'),
                 temperature=0.5
             )
-        elif env.get('USE_GEMINI') == True:
+        elif eval(env.get('USE_GEMINI')) == True:
             self.model = ChatGoogleGenerativeAI(
                 model=env.get('GEMINI_MODEL_ID'), 
                 google_api_key=env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'),
                 temperature=0.5,
                 convert_system_message_to_human=True
             )
-        elif env.get('USE_GROQ') == True:
+        elif eval(env.get('USE_GROQ')) == True:
             self.model = ChatGroq(
                 model=env.get('GROQ_MODEL_ID'),
                 api_key=env.get('GROQ_API_KEY'),
@@ -33,17 +37,18 @@ class RagHelper:
                 max_retries=2,
             )
             
-        if env.get('USE_OLLAMA_EMBEDDING') == True:
+        if eval(env.get('USE_OLLAMA_EMBEDDING')) == True:
+            print("using ollama embeddings...")
             self.embeddings = OllamaEmbeddings(
                 base_url= env.get('OLLAMA_URL'), 
                 model=env.get('OLLAMA_EMBEDDING_MODEL_ID')
             )
-        elif env.get('USE_GOOGLE_EMBEDDING') == True:
+        elif eval(env.get('USE_GOOGLE_EMBEDDING')) == True:
             self.embeddings = GoogleGenerativeAIEmbeddings(
                 model=env.get('GEMINI_EMBEDDING_MODEL_ID'), 
                 google_api_key=env.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY')
             )
-        elif env.get('USE_HUGGINGFACE_EMBEDDING') == True:
+        elif eval(env.get('USE_HUGGINGFACE_EMBEDDING')) == True:
             self.embeddings = HuggingFaceBgeEmbeddings(
                 model_name=env.get('HUGGINGFACE_EMBEDDING_MODEL_ID'), 
                 model_kwargs={"device": "cpu"},

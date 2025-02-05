@@ -1,5 +1,5 @@
 from typing import List
-from flask import jsonify, make_response, redirect, Blueprint, current_app as app
+from flask import jsonify, request, make_response, redirect, Blueprint, current_app as app
 from helpers.formatting import format_list, sqlalchemy_to_dict
 from models.product_model import ProductModel
 from repositories.product_repository import ProductRepository
@@ -26,13 +26,33 @@ def redirect_to_gradio():
     return redirect(app.config.get('GRADIO_URL'), code=302)
 
 
-@api_bp.route("/chat/gemini", methods=['POST'])
+@api_bp.route("/products/<product_id>", methods=['GET'])
+def get_by_id(product_id: int):
+    if product_id:
+        product_repo = ProductRepository(app.config['DB']())
+        product = product_repo.fetch_by_id(product_id)
+        response = make_response(jsonify({
+            "data" : product.to_dict()
+        }))
+        response.status_code = 200
+    else:
+        response = make_response(jsonify({
+            "error" : "no product found with the given id"
+        }))
+        response.status_code = 404
+        
+    response.headers['content-type'] = 'application/json'
+    return response
+
+@api_bp.route("/chat", methods=['POST'])
 def chat_with_assistant():
-    gemini_chat = Chatbot(app.config.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'))
-    gemini_chat.set_parser(OutputParserTypes.STRING)
-    gemini_chat.set_vector_store(app.config['QDRANT']().get_collection("products"))
-    # chat_response = gemini_chat.invoke("hello")
-    response = gemini_chat.greet()
+    chat = app.config['CHAT']()
+    rag_pipeline = app.config['RAG_PIPELINE']()
+    
+    request_data = request.get_json()
+    query = request_data['message']
+    print(f"user query: {query}")
+    response = chat.invoke(query, rag_pipeline)
 
     print(f"chat response: {response}")
 

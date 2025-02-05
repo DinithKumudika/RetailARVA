@@ -7,7 +7,7 @@ Basic Information
 Name: {name}
 Brand: {brand}
 Category: {category}
-Price: ${price:.2f}
+Price: LKR{price:.2f}
 Is Natural: {is_natural}
 Ingredient concentrations level: {concentrations}
 
