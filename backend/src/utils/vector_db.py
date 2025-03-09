@@ -1,10 +1,21 @@
 from typing import List
 from langchain_qdrant import QdrantVectorStore, RetrievalMode
 from langchain.docstore.document import Document
-from utils.rag_helper import RagHelper
+from src.utils.rag_helper import RagHelper
 
 class VectorDb:
-    def __init__(self, url : str, api_key : str) -> None:
+    """
+    A class to interact with a Qdrant vector database using LangChain's Qdrant integration.
+    Provides methods to manage collections, embed documents, and retrieve data.
+    """
+    def __init__(self, url : str, api_key : str| None = None) -> None:
+        """
+        Initialize the VectorDb instance.
+
+        Args:
+            url (str): The URL of the Qdrant server.
+            api_key (Optional[str]): The API key for authentication (if required).
+        """
         self.embeddings = None
         self.url = url
         self.api_key = api_key
@@ -18,45 +29,139 @@ class VectorDb:
     #     )
     #     return self.vector_store
     
-    def set_embedding_model(self):
-        rag_helper = RagHelper()
-        self.embeddings = rag_helper.get_embedding_model()
+    def set_embedding_model(self, embedding_model = None):
+        """
+        Set the embedding model for vectorizing documents.
+
+        If no embedding model is provided, it uses the default model from RagHelper.
+
+        Args:
+            embedding_model (Optional): A custom embedding model. Defaults to None.
+        Raises:
+            ValueError: If the embedding model is not set.
+        """
+        if embedding_model:
+            self.embeddings = embedding_model
+        else:
+            rag_helper = RagHelper()
+            self.embeddings = rag_helper.get_embedding_model()
+            print(f"embedding model: {self.embeddings.model}")
+            
+        if self.embeddings is None:
+            raise ValueError("Failed to set embedding model. Ensure RagHelper or custom model is configured correctly.")
 
     def get_collection(self, collection: str) -> QdrantVectorStore:
-        self.vector_store = QdrantVectorStore.from_existing_collection(
-            collection_name=collection,
-            url=self.url,
-            api_key=self.api_key,
-            embedding=self.embeddings,
-            prefer_grpc=True
-        )
-        return self.vector_store
+        """
+        Connect to an existing Qdrant collection.
+
+        Args:
+            collection (str): The name of the collection to connect to.
+
+        Returns:
+            QdrantVectorStore: A QdrantVectorStore instance connected to the specified collection.
+
+        Raises:
+            ValueError: If the collection does not exist or the embedding model is not set.
+        """
+        if self.embeddings is None:
+            raise ValueError("Embedding model is not set. Call `set_embedding_model` first.")
+        
+        try:
+            self.vector_store = QdrantVectorStore.from_existing_collection(
+                collection_name=collection,
+                url=self.url,
+                api_key=self.api_key,
+                embedding=self.embeddings,
+                prefer_grpc=True
+            )
+            return self.vector_store
+        except Exception as e:
+            raise ValueError(f"Failed to connect to collection '{collection}': {e}")
     
     def embed_documents(self, docs : List[Document], collection: str) -> QdrantVectorStore:
-        qdrant = QdrantVectorStore.from_documents(
-            docs,
-            self.embeddings,
-            url=self.url,
-            prefer_grpc=True,
-            api_key=self.api_key,
-            collection_name=collection
-        )
-        self.vector_store = qdrant
+        """
+        Embed a list of documents into a Qdrant collection.
+
+        If the collection does not exist, it will be created.
+
+        Args:
+            docs (List[Document]): A list of Document objects to embed.
+            collection (str): The name of the collection to store the documents in.
+
+        Returns:
+            QdrantVectorStore: A QdrantVectorStore instance connected to the updated collection.
+
+        Raises:
+            ValueError: If the embedding model is not set or if embedding fails.
+        """
+        if self.embeddings is None:
+            raise ValueError("Embedding model is not set. Call `set_embedding_model` first.")
+        
+        try:
+            qdrant = QdrantVectorStore.from_documents(
+                docs,
+                self.embeddings,
+                url=self.url,
+                prefer_grpc=True,
+                api_key=self.api_key,
+                collection_name=collection
+            )
+            self.vector_store = qdrant
+            return qdrant
+        except Exception as e:
+            raise ValueError(f"Failed to embed documents into collection '{collection}': {e}")
     
     def get_point_ids_in_collection(self, collection: str, limit: int) -> list:
-        record_ids = []
-        scroll_result = self.vector_store.client.scroll(collection_name=collection, limit=limit)
+        """
+        Retrieve the IDs of points (vectors) in a Qdrant collection.
 
-        while scroll_result:
-            record_ids.extend(point["id"] for point in scroll_result["points"])
-            if not scroll_result["next_page"]:
-                break
+        Uses pagination to handle large collections.
+
+        Args:
+            collection (str): The name of the collection.
+            limit (int): The maximum number of points to retrieve per page. Defaults to 100.
+
+        Returns:
+            List[str]: A list of point IDs in the collection.
+
+        Raises:
+            ValueError: If the vector store is not initialized or if scrolling fails.
+        """
+        if self.vector_store is None:
+            raise ValueError("Vector store is not initialized. Call `get_collection` or `embed_documents` first.")
+        
+        record_ids = []
+        try:
             scroll_result = self.vector_store.client.scroll(collection_name=collection, limit=limit)
+
+            while scroll_result:
+                record_ids.extend(point["id"] for point in scroll_result["points"])
+                if not scroll_result["next_page"]:
+                    break
+                scroll_result = self.vector_store.client.scroll(collection_name=collection, limit=limit)
+        except Exception as e:
+            raise ValueError(f"Failed to retrieve point IDs from collection '{collection}': {e}")
         
         return record_ids
     
     def get_point_count_in_collection(self, collection: str) -> int | None:
-        collection_info = self.vector_store.client.get_collection(collection)
-        return collection_info.vectors_count
+        """
+        Get the total number of vectors (points) in a Qdrant collection.
 
+        Args:
+            collection (str): The name of the collection.
+
+        Returns:
+            Optional[int]: The total number of vectors in the collection, or None if retrieval fails.
+
+        Raises:
+            ValueError: If the vector store is not initialized or if the collection info cannot be retrieved.
+        """
+        if self.vector_store is None:
+            raise ValueError("Vector store is not initialized. Call `get_collection` or `embed_documents` first.")
+        try:
+            collection_info = self.vector_store.client.get_collection(collection)
+            return collection_info.vectors_count
+        except Exception as e:
+            raise ValueError(f"Failed to retrieve point count for collection '{collection}': {e}")
         

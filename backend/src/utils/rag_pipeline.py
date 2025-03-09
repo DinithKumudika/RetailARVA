@@ -1,3 +1,4 @@
+from typing import List
 from sentence_transformers import CrossEncoder
 from langchain_qdrant import QdrantVectorStore
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -11,16 +12,18 @@ from langchain_community.document_transformers import (
 )
 from markdownify import markdownify as md
 
-from utils.prompts import contextualize_q_system_prompt, system_prompt, qa_system_prompt, query_expansion_prompt
-from utils.parsers import QuestionArrayOutputParser
+from src.utils.prompts import contextualize_q_system_prompt, system_prompt, qa_system_prompt, query_expansion_prompt
+from src.utils.parsers import QuestionArrayOutputParser
 
 
 class RagPipeline:
-     def __init__(self, vector_store: QdrantVectorStore, search_k: int, model):
+     def __init__(self, vector_store: QdrantVectorStore, search_k: int, model, embedding_model):
           self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
           self.vector_store = vector_store
+          self.search_k = search_k
           self.retriever = vector_store.as_retriever(search_kwargs={"k": search_k})
           self.model = model
+          self.embedding_model = embedding_model
           self.history_aware_retriever = None
           self.qa_chain = None
           self.rag_chain = None
@@ -56,23 +59,44 @@ class RagPipeline:
      def set_rag_chain(self):
           self.rag_chain = create_retrieval_chain(self.history_aware_retriever, self.qa_chain)
           
-     def expand_query(self, query: str):
+     def expand_query(self, query: str) -> List[str]:
           q_expansion_prompt = PromptTemplate(
                input_variables=["query"],
                template=query_expansion_prompt,
           )
           q_expansion_chain = q_expansion_prompt | self.model | QuestionArrayOutputParser()
           queries = q_expansion_chain.invoke(query)
-
-          for expanded_query in queries:
-               print("<----------------------- Expanded Queries ------------------------------------>")
-               print(expanded_query)
           
           return queries
      
      def invoke(self, query: str, chat_history: list):
           queries = self.expand_query(query)
-          docs = [self.retriever.invoke(input=query) for query in queries]
+          
+          print("<----------------------- Expanded Queries ------------------------------------>")
+          for expanded_query in queries:   
+               print(expanded_query)
+          print("<------------------------------------------------------------------------------>")     
+
+          
+          docs = []
+          
+          for expanded_query in queries:
+               print(f"retrieving documents for query: {expanded_query}...")
+               try:
+                    retrieved_docs = self.retriever.invoke(expanded_query)
+                    # response = self.vector_store.client.query_points(
+                    #      collection_name="products",
+                    #      query= self.embedding_model.embed_documents([expanded_query]),
+                    #      limit=self.search_k
+                    # )
+                    print(f"no of retrieved docs for query: {len(retrieved_docs)}")
+                    docs.append(retrieved_docs)
+               except Exception as e:
+                    print(f"Error during retriever.invoke(): {e}")
+                    print(f"Type of error: {type(e)}")
+                    print(f"Error details: {e.args}")
+                    
+          print(docs)
           
           for sublist in docs:
                for doc in sublist:
@@ -88,7 +112,7 @@ class RagPipeline:
                          unique_docs.append(doc)
                          unique_contents.add(doc.page_content)
           unique_contents = list(unique_contents)
-          print(f"{len(unique_contents)} docs retrieved from query expansion")
+          print(f"{len(unique_contents)} unique docs retrieved from query expansion")
           
           # create query and retrieved document pairs for reranking
           pairs = []

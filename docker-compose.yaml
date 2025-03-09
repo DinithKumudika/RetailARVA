@@ -1,0 +1,91 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    container_name: RetailARVA.Mongo
+  ollama:
+    build:
+      context: ./ollama
+      dockerfile: Dockerfile
+    expose:
+      - 11434
+    ports:
+      - "11434:11434"
+    runtime: nvidia
+    environment:
+      - NIVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - ollama-data:/root/.ollama
+    entrypoint: ["/usr/bin/bash", "pull-models.sh"]
+    container_name: RetailARVA.Ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+      - ollama
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV = 'development'
+      - ENVIRONMENT = 'development'
+      - MONGO_HOST = mongo
+      - MONGO_PORT = 27017
+      - MONGO_DBNAME = "retailarvadb"
+      - USE_GROQ=False
+      - USE_OLLAMA=True
+      - USE_GEMINI=False
+      - USE_HUGGINGFACE_EMBEDDING=False
+      - USE_GOOGLE_EMBEDDING=False
+      - USE_OLLAMA_EMBEDDING=True
+      - OLLAMA_URL="http://ollama:11434"
+      - OLLAMA_MODEL_ID="llama3.1:latest"
+      - OLLAMA_EMBEDDING_MODEL_ID="nomic-embed-text:latest"
+      - GEMINI_MODEL_ID="gemini-1.5-flash"
+      - GEMINI_EMBEDDING_MODEL_ID="llama3.1:latest"
+      - GOOGLE_GENERATIVE_LANGUAGE_API_KEY="AIzaSyDpcYeeReEC_IdaiNRtMJLfqTJpX74ZtLI"
+      - GROQ_API_KEY="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"
+      - GROQ_MODEL_ID="llama-3.1-8b-instant"
+      - HUGGINGFACE_EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
+      - QDRANT_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.Z5PMRPegDxYyvVlCmkGmiLD0UuAj0WdrsqeXEMvJz_Q"
+      - QDRANT_CLUSTER_URL="https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io"
+      - ELEVENLABS_API_KEY="sk_b0206ca0a7d97fa2b60ae41448b7f47e02872aec6d6cb65f"
+      - GOOGLE_APPLICATION_CREDENTIALS="C:\\Users\\dinit\\Documents\\Research\\Development\\test-playground\\retailarva-6169e9007515.json"
+      - GRADIO_URL="http://127.0.0.1:7860"
+      - GRADIO_PORT=7860
+
+      - NGROK_AUTH_TOKEN="2pLD51lUVLQIOklGiSazGnQ7zLr_795mWrmQJAQ81AteoLCVT"
+      - NGROK_STATIC_DOMAIN="alert-evolved-chicken.ngrok-free.app"
+      - NGROK_API_KEY="2pLIqaJvCW1wiY5H1ZO6TUES8nt_73Jvh7frCqNjS6vVVVBKh"
+
+      - LANGSMITH_TRACING=true
+      - LANGSMITH_ENDPOINT="https://api.smith.langchain.com"
+      - LANGSMITH_API_KEY="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"
+      - LANGSMITH_PROJECT="retailarva-chatbot"
+    volumes:
+      - retailarva-data:/app/src/data
+    container_name: RetailARVA.Api
+    networks: 
+      - retailARVA
+volumes:
+  reatilarva-data:
+  mongo-data:
+  ollama-data:
+networks:
+  retailARVA:

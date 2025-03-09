@@ -1,0 +1,14 @@
+logs/
+temp/
+*.log
+*.pyc
+__pycache__/
+.vscode/
+.vscode
+env/         
+src/data/     
+src/logs/         
+.env
+.env.example
+.gitignore
+Modelfile

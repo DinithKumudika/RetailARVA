@@ -1,14 +1,20 @@
 from typing import List
+from bson import ObjectId
 from flask import jsonify, request, make_response, redirect, Blueprint, current_app as app
-from helpers.formatting import format_list, sqlalchemy_to_dict
-from models.product_model import ProductModel
-from repositories.product_repository import ProductRepository
-from utils.vector_db import VectorDb
-import templates
-from utils.chatbot import Chatbot, OutputParserTypes
+from flask_pymongo import PyMongo
+from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError
+from src.helpers.formatting import format_list
+from src.helpers.db import get_product_by_id, get_all_products, add_produts, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user
+from src.utils.vector_db import VectorDb
 from langchain.docstore.document import Document
+from src.models.models import User, Chat, Message
+from src.utils.chatbot import Chatbot
+from src.helpers.import_json_to_mongo import load_from_csv
+from src import templates
 
 api_bp = Blueprint("api", __name__)
+
+
 
 @api_bp.route("/", methods=['GET'])
 def root():
@@ -20,94 +26,302 @@ def root():
     response.headers['content-type'] = 'application/json'
     return response
 
+@api_bp.route("/database", methods=['GET'])
+async def test_db_connection():
+    mongo : PyMongo = app.config.get('MONGO')
+    
+    response = make_response(jsonify({
+        "message" : f"connected to {mongo.db.name}"
+    }))
+
+    response.status_code = 200
+    response.headers['content-type'] = 'application/json'
+    return response
+
+@api_bp.route("/database/collections", methods=['GET'])
+async def get_collections():
+    mongo : PyMongo = app.config.get('MONGO')
+    collections = mongo.db.list_collection_names()
+    print("Collections in the database:")
+    for collection in collections:
+        print(collection)
+    
+    response = make_response(jsonify({
+        "data": collections,
+        "message" : f"{len(collections)} in the database"
+    }))
+
+    response.status_code = 200
+    response.headers['content-type'] = 'application/json'
+    return response
 
 @api_bp.route('/gradio-app')
 def redirect_to_gradio():
     return redirect(app.config.get('GRADIO_URL'), code=302)
 
-
-@api_bp.route("/products/<product_id>", methods=['GET'])
-def get_by_id(product_id: int):
-    if product_id:
-        product_repo = ProductRepository(app.config['DB']())
-        product = product_repo.fetch_by_id(product_id)
+@api_bp.route("/products", methods=['POST'])
+async def add_products():
+    try:
+        products = load_from_csv("./src/data/products.csv")
+        # save_to_json("./src/data/products.json", products)
+        
+        ids = add_produts(products)
+        
+        if len(ids) > 0:
+            response = make_response(jsonify({
+                "data" : ids,
+                "message": f"{len(ids)} products successfully added"
+            }))
+            response.status_code = 201
+    except FileNotFoundError:
         response = make_response(jsonify({
-            "data" : product.to_dict()
+                "message" : f"product info source doesn't exist"
         }))
-        response.status_code = 200
-    else:
+        response.status_code = 404        
+    except Exception:
         response = make_response(jsonify({
-            "error" : "no product found with the given id"
+                "message" : f"something went wrong"
+        }))
+        response.status_code = 500
+    response.headers['content-type'] = 'application/json'
+    return response
+
+@api_bp.route("/users", methods=['POST'])
+def add_new_user():
+    try:
+        data = request.get_json()
+        if not data or 'first_name' not in data or 'last_name' not in data:
+            response = make_response(jsonify({
+                "error": "Invalid payload. Please provide 'first_name' and 'last_name'."
+            }))
+            response.status_code = 400
+        
+        user_id = add_user(User(
+            first_name=data.get('first_name'), 
+            last_name=data.get('last_name')
+        ))
+        
+        user = get_user_by_id(user_id)
+        response = make_response(jsonify({
+            "message": f"new user with id {str(user_id)} created",
+            "data": User(
+                _id=str(user._id) if user._id else None,  # Convert ObjectId to string
+                first_name=user.first_name,
+                last_name=user.last_name,
+                created_at=user.created_at,
+            ).to_dict()
+        }))
+        response.status_code = 201  
+    except UserNotFoundError as ex:
+        response = make_response(jsonify({
+            "message" : str(ex)
         }))
         response.status_code = 404
+    except Exception:
+        response = make_response(jsonify({
+                "message" : "something went wrong"
+        }))
+        response.status_code = 500
         
     response.headers['content-type'] = 'application/json'
     return response
 
-@api_bp.route("/chat", methods=['POST'])
-def chat_with_assistant():
-    chat = app.config['CHAT']()
-    rag_pipeline = app.config['RAG_PIPELINE']()
+@api_bp.route("/users/<user_id>", methods=['GET'])    
+def get_user_by_user_id(user_id: str):
+    try:
+        if user_id:
+            user = get_user_by_id(user_id)
+            response = make_response(jsonify({
+                "data" : User(
+                    _id=str(user._id) if user._id else None,  # Convert ObjectId to string
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    created_at=user.created_at,
+                ),
+                "message": f"user with id {user_id} retieved successfully"
+            }))
+            response.status_code = 200 
+        else:
+            response = make_response(jsonify({
+                "message" : "invalid request parameter"
+            }))
+            response.status_code = 400
+    except UserNotFoundError as ex:
+        response = make_response(jsonify({
+            "message" : str(ex)
+        }))
+        response.status_code = 404
+    except Exception:
+        response = make_response(jsonify({
+                "message" : "something went wrong"
+        }))
+        response.status_code = 500
+    response.headers['content-type'] = 'application/json'
+    return response   
+
+@api_bp.route("/products/<product_id>", methods=['GET'])
+def get_product_by_product_id(product_id: int):
+    try:
+        if product_id:
+            product = get_product_by_id(product_id)
+            response = make_response(jsonify({
+                "data" : product.to_dict(),
+                "message": "product retieved successfully"
+            }))
+            response.status_code = 200
+        else:
+            response = make_response(jsonify({
+                "message" : "invalid request parameter"
+            }))
+            response.status_code = 400
+    except ProductNotFoundError as ex:
+        response = make_response(jsonify({
+                "message" : str(ex)
+            }))
+        response.status_code = 404
+    except Exception:
+        response = make_response(jsonify({
+                "message" : "something went wrong"
+        }))
+        response.status_code = 500    
     
-    request_data = request.get_json()
-    query = request_data['message']
-    print(f"user query: {query}")
-    response = chat.invoke(query, rag_pipeline)
-
-    print(f"chat response: {response}")
-
-    response = make_response(jsonify({
-        "response" : response
-    }))
-
-    response.status_code = 201
     response.headers['content-type'] = 'application/json'
     return response
 
+@api_bp.route("/chat/new/<user_id>", methods=['POST'])
+def create_new_chat(user_id: str):
+    chat: Chatbot = app.config['CHAT']()
+    try:
+        if user_id:
+            user = get_user_by_id(user_id)
+            chat_id = create_chat(Chat(user_id=user_id))
+            response = chat.greet()
+            message_id = add_chat_message(
+                Message(
+                    chat_id=chat_id, 
+                    role="assistant", 
+                    content=response,
+                    message_id=1
+                )
+            )
+            is_updated = update_message_count(chat_id=chat_id, count=1)
+
+            if is_updated:
+                response = make_response(jsonify({
+                    "data" : Message(
+                            _id=message_id, 
+                            chat_id=chat_id, 
+                            content=response, 
+                            role="assistant", 
+                            message_id=1
+                        ).to_dict(),
+                    "message": f"chat session with chat id {chat_id} created successfully"
+                }))
+                response.status_code = 201    
+            else:
+                response = make_response(jsonify({
+                    "message" : "something went wrong"
+                }))
+                response.status_code = 500                
+    except UserNotFoundError as ex:
+        response = make_response(jsonify({
+                "message" : str(ex)
+        }))
+        response.status_code = 404
+    except Exception:
+        response = make_response(jsonify({
+                "message" : "something went wrong"
+        }))
+        response.status_code = 500
+    response.headers['content-type'] = 'application/json'
+    return response  
+        
+
+@api_bp.route("/chat/<chat_id>", methods=['POST'])
+def chat_with_assistant(chat_id: str):
+    try:
+        if chat_id:
+            chat: Chatbot = app.config['CHAT']()
+            
+            request_data = request.get_json()
+            user_id = request_data.get('user_id')
+            query = request_data.get('message')
+            role = request_data.get('role')
+            
+            print(f"user query: {query}")
+            
+            chat_history = get_chat_history_by_chat_id(chat_id=chat_id)
+            
+            formatted_history:list = chat.format_to_message_history(chat_history=chat_history)
+            response = chat.invoke(query=query, chat_history=formatted_history)
+            
+            print(f"chat response: {response}")
+            
+            add_chat_message(Message(
+                role=role, 
+                content=query, 
+                chat_id=ObjectId(chat_id), 
+                message_id=len(chat_history) + 1
+            ))
+            
+            message_id = add_chat_message(Message(
+                role="assistant", 
+                content=response, 
+                chat_id=ObjectId(chat_id), 
+                message_id=len(chat_history) + 2
+            ))
+            
+            response = make_response(jsonify({
+                "data": Message(
+                        _id=message_id, 
+                        chat_id=ObjectId(chat_id), 
+                        role="assistant", 
+                        content=response, 
+                        message_id=len(chat_history) + 2
+                    ).to_dict(),
+                "message" : f"message with id {message_id} added to the chat {chat_id}"
+            }))
+            response.status_code = 201
+    except ChatHistoryNotFoundError as ex:
+        response = make_response(jsonify({
+                "message" : str(ex)
+        }))
+        response.status_code = 404
+    except Exception as ex:
+        print(str(ex))
+        response = make_response(jsonify({
+                "message" : "something went wrong"
+        }))
+        response.status_code = 500
+    response.headers['content-type'] = 'application/json'
+    return response
 
 @api_bp.route("/products/embeddings", methods=['POST'])
 def create_product_embeddings():
     product_profiles : list[str] = []
     docs : List[Document] = []
-    product_repo = ProductRepository(app.config['DB']())
     qdrant : VectorDb = app.config['QDRANT']()
     
-    for product in product_repo.fetch_all():
-        product_data = sqlalchemy_to_dict(product)
-        # Convert comma-separated strings to lists
-        product_data['ingredients'] = product_data['ingredients'].split(',')
-        product_data['key_ingredients'] = product_data['key_ingredients'].split(',')
-        product_data['benefits'] = product_data['benefits'].split(',')
-        product_data['application_tips'] = product_data['application_tips'].split(',')
-        product_data['skin_types'] = product_data['skin_types'].split(',')
-        product_data['skin_concerns'] = product_data['skin_concerns'].split(',')
-        if product_data['side_effects']:
-            product_data['side_effects'] = product_data['side_effects'].split(',')
-        if product_data['allergens']:
-            product_data['allergens'] = product_data['allergens'].split(',')
-        if product_data['sensitivities']:
-            product_data['sensitivities'] = product_data['sensitivities'].split(',')
-        
-        product_model = ProductModel(**product_data)
+    for product in get_all_products():
 
         product_profile = templates.product_profile.format(
-            id=product_model.id,
-            name=product_model.name,
-            brand=product_model.brand,
-            category=product_model.category,
-            price=product_model.price,
-            is_natural="Yes" if product_model.is_natural else "No",
-            concentrations=product_model.concentrations,
-            ingredients_list=format_list(product_model.ingredients),
-            key_ingredients_list=format_list(product_model.key_ingredients),
-            benefits_list=format_list(product_model.benefits),
-            side_effects_list=format_list(product_model.side_effects),
+            id=product.id,
+            name=product.name,
+            brand=product.brand,
+            category=product.category,
+            price=product.price,
+            is_natural="Yes" if product.is_natural else "No",
+            concentrations=product.concentrations,
+            ingredients_list=format_list(product.ingredients),
+            key_ingredients_list=format_list(product.key_ingredients),
+            benefits_list=product.benefits,
+            side_effects_list=format_list(product.side_effects),
             usage=product.usage,
-            application_tips_list=format_list(product_model.application_tips),
-            skin_types_list=format_list(product_model.skin_types),
-            skin_concerns_list=format_list(product_model.skin_concerns),
-            allergens_list=format_list(product_model.allergens),
-            sensitivities_list=format_list(product_model.sensitivities)            
+            application_tips=product.application_tips,
+            skin_types=product.skin_types,
+            skin_concerns_list=format_list(product.skin_concerns),
+            allergens_list=format_list(product.allergens),
+            sensitivities_list=format_list(product.sensitivities)            
         )
 
         product_profiles.append(product_profile)
@@ -116,10 +330,10 @@ def create_product_embeddings():
             Document(
                 page_content=product_profile,
                 metadata={
-                    "id": product_model.id,
-                    "product name": product_model.name,
-                    "product brand": product_model.brand,
-                    "product category": product_model.category
+                    "id": product.id,
+                    "product name": product.name,
+                    "product brand": product.brand,
+                    "product category": product.category
                 }
             )
         )
@@ -135,4 +349,4 @@ def create_product_embeddings():
     }))
     response.status_code = 201
     response.headers['content-type'] = 'application/json'
-    return product_profiles
+    return response

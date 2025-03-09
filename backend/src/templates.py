@@ -31,12 +31,12 @@ Usage Instructions:
 {usage}
 
 Application Tips:
-{application_tips_list}
+{application_tips}
 
 Skin Compatibility
 ------------------
 Suitable for Skin Types:
-{skin_types_list}
+{skin_types}
 
 Addresses Skin Concerns:
 {skin_concerns_list}

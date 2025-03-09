@@ -4,26 +4,28 @@ from bson.objectid import ObjectId
 class Product:
     def __init__(
         self,
-        name,
-        brand,
-        category,
-        price,
-        ingredients,
-        key_ingredients,
-        benefits,
-        is_natural,
-        concentrations,
-        usage,
-        application_tips,
-        skin_types,
-        skin_concerns,
-        side_effects=None,
-        allergens=None,
-        sensitivities=None,
+        product_id: int,
+        name: str,
+        brand: str,
+        category: str,
+        price: float,
+        ingredients: list,
+        key_ingredients: list,
+        benefits: str,
+        is_natural: bool,
+        concentrations: str,
+        usage: str,
+        application_tips: str,
+        skin_types: str,
+        skin_concerns: list,
+        allergens: list | None = None,
+        side_effects: str | None = None,
+        sensitivities: str| None = None,
         _id=None,
     ):
         self._id = _id if _id else ObjectId()
         self.name = name
+        self.id = product_id
         self.brand = brand
         self.category = category
         self.price = price
@@ -47,6 +49,7 @@ class Product:
         return {
             "_id": self._id,
             "name": self.name,
+            "product_id": self.id,
             "brand": self.brand,
             "category": self.category,
             "price": self.price,
@@ -69,8 +72,10 @@ class Product:
         """
         Creates a Product object from a dictionary (e.g., retrieved from MongoDB).
         """
+        print(data.get("product_id"))
         return Product(
             _id=data.get("_id"),
+            product_id=data.get("product_id"),
             name=data.get("name"),
             brand=data.get("brand"),
             category=data.get("category"),
@@ -123,14 +128,47 @@ class CustomerReview:
         )
 
     def __repr__(self):
-        return f"CustomerReview(product_id='{self.product_id}', rating={self.rating})"        
+        return f"CustomerReview(product_id='{self.product_id}', rating={self.rating})"       
+    
+class User:
+    def __init__(self, first_name : str, last_name : str, _id=None, created_at=None):
+        self._id = _id if _id else ObjectId()
+        self.first_name = first_name
+        self.last_name = last_name
+        self.created_at = created_at if created_at else datetime.utcnow()
+    
+    def to_dict(self):
+        """
+        Converts the User object into a dictionary for MongoDB.
+        """
+        return {
+            "_id": self._id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "created_at": self.created_at
+        }  
+        
+    @staticmethod
+    def from_dict(data):
+        """
+        Creates a User object from a dictionary (e.g., retrieved from MongoDB).
+        """
+        return User(
+            _id=data.get("_id"),
+            first_name=data.get("first_name"),
+            last_name=data.get("last_name"),
+            created_at=data.get("created_at"),
+        )
+    
+    def __repr__(self):
+        return f"User(first_name='{self.first_named}', last_name='{self.last_name}')"
 
 class Chat:
-    def __init__(self, messages_count=0, _id=None, created_at=None):
-        self._id = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
-        self.messages_count = messages_count
+    def __init__(self, user_id: str, messages_count: int = 0, _id=None, created_at=None):
+        self._id: ObjectId = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
+        self.user_id: ObjectId = ObjectId(user_id)
+        self.messages_count: int = messages_count
         self.created_at = created_at if created_at else datetime.utcnow()  # Timestamp for creation
-        self.messages = []  # List to store embedded messages
 
     def to_dict(self):
         """
@@ -138,9 +176,9 @@ class Chat:
         """
         return {
             "_id": self._id,
+            "user_id": self.user_id,
             "messages_count": self.messages_count,
-            "created_at": self.created_at,
-            "messages": [message.to_dict() for message in self.messages],  # Embed messages
+            "created_at": self.created_at
         }
 
     @staticmethod
@@ -148,25 +186,24 @@ class Chat:
         """
         Creates a Chat object from a dictionary (e.g., retrieved from MongoDB).
         """
-        chat = Chat(
+        return Chat(
             _id=data.get("_id"),
+            user_id=data.get("user_id"),
             messages_count=data.get("messages_count"),
             created_at=data.get("created_at"),
         )
-        # Add embedded messages
-        chat.messages = [Message.from_dict(message) for message in data.get("messages", [])]
-        return chat
 
     def __repr__(self):
-        return f"Chat(_id='{self._id}', messages_count={self.messages_count})"
+        return f"Chat(_id='{self._id}', user_id='{self.user_id}', messages_count={self.messages_count})"
         
 
 class Message:
-    def __init__(self, chat_id, role, content, _id=None):
-        self._id = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
-        self.chat_id = ObjectId(chat_id)  # Reference to the parent chat
-        self.role = role
-        self.content = content
+    def __init__(self, chat_id: ObjectId, role: str, content: str, message_id: int, _id=None):
+        self._id: ObjectId = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
+        self.chat_id: ObjectId = chat_id  # Reference to the parent chat
+        self.message_id: int = message_id
+        self.role: str = role
+        self.content: str = content
 
     def to_dict(self):
         """
@@ -176,6 +213,7 @@ class Message:
             "_id": self._id,
             "chat_id": self.chat_id,
             "role": self.role,
+            "message_id": self.message_id,
             "content": self.content,
         }
 
@@ -188,8 +226,9 @@ class Message:
             _id=data.get("_id"),
             chat_id=data.get("chat_id"),
             role=data.get("role"),
+            message_id=data.get("message_id"),
             content=data.get("content"),
         )
 
     def __repr__(self):
-        return f"Message(chat_id='{self.chat_id}', role='{self.role}')"
+        return f"Message(chat_id='{self.chat_id}', role='{self.role}', message_id='{self.message_id}')"
