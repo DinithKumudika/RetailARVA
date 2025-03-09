@@ -1,4 +1,40 @@
-### Installation
+# RetailARVA VR Assitant - Rest API
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)  
+![Python](https://img.shields.io/badge/python-3.9-blue.svg)  
+
+## 📌 Table of Contents
+- [About the Project](#about-the-project)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Examples](#examples)
+- [License](#license)
+
+---
+
+## 📖 About the Project
+
+This project is a Python-based REST API backend of RetailARVA.
+
+## 🛠 Installation
+1. **Clone the repository if you haven't**  
+   ```bash
+   git clone https://github.com/DinithKumudika/RetailARVA.git
+   cd backend
+   ```
+
+2. **Install python 3.9**  
+3. **Create a python virtual environment. if multiple python versions exists, specify the required python version**
+    ```bash
+    py -3.9 -m venv env
+    ```
+4. **Activate virtual environment**
+    ```bash
+    env\Scripts\activate
+    ```
+5. **Install poetry in the virtual env to manage dependencies**
+    https://python-poetry.org/docs/#installing-with-pipx
 
 #### Google Cloud Setup
 1. follow the instructions on https://cloud.google.com/sdk/docs/install-sdk to install Google Cloud CLI for your OS
