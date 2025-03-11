@@ -131,10 +131,11 @@ class CustomerReview:
         return f"CustomerReview(product_id='{self.product_id}', rating={self.rating})"       
     
 class User:
-    def __init__(self, first_name : str, last_name : str, _id=None, created_at=None):
+    def __init__(self, first_name : str, last_name : str, email: str, _id=None, created_at=None):
         self._id = _id if _id else ObjectId()
         self.first_name = first_name
         self.last_name = last_name
+        self.email = email
         self.created_at = created_at if created_at else datetime.utcnow()
     
     def to_dict(self):
@@ -145,6 +146,7 @@ class User:
             "_id": self._id,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "email": self.email,
             "created_at": self.created_at
         }  
         
@@ -157,11 +159,12 @@ class User:
             _id=data.get("_id"),
             first_name=data.get("first_name"),
             last_name=data.get("last_name"),
+            email=data.get("email"),
             created_at=data.get("created_at"),
         )
     
     def __repr__(self):
-        return f"User(first_name='{self.first_named}', last_name='{self.last_name}')"
+        return f"User(first_name='{self.first_name}', last_name='{self.last_name}', email='{self.email}')"
 
 class Chat:
     def __init__(self, user_id: str, messages_count: int = 0, _id=None, created_at=None):

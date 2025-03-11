@@ -4,7 +4,7 @@ from flask import jsonify, request, make_response, redirect, Blueprint, current_
 from flask_pymongo import PyMongo
 from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError
 from src.helpers.formatting import format_list
-from src.helpers.db import get_product_by_id, get_all_products, add_produts, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user
+from src.helpers.db import get_product_by_id, get_all_products, add_produts, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email
 from src.utils.vector_db import VectorDb
 from langchain.docstore.document import Document
 from src.models.models import User, Chat, Message
@@ -90,15 +90,16 @@ async def add_products():
 def add_new_user():
     try:
         data = request.get_json()
-        if not data or 'first_name' not in data or 'last_name' not in data:
+        if not data or 'first_name' not in data or 'last_name' not in data or 'email' not in data:
             response = make_response(jsonify({
-                "error": "Invalid payload. Please provide 'first_name' and 'last_name'."
+                "error": "Invalid payload. Please provide 'first_name', 'last_name' and 'email'"
             }))
             response.status_code = 400
         
         user_id = add_user(User(
             first_name=data.get('first_name'), 
-            last_name=data.get('last_name')
+            last_name=data.get('last_name'),
+            email=data.get('email')
         ))
         
         user = get_user_by_id(user_id)
@@ -126,6 +127,42 @@ def add_new_user():
     response.headers['content-type'] = 'application/json'
     return response
 
+@api_bp.route("/users/login", methods=['POST'])
+def login_user():
+    try:
+        data = request.get_json()
+        if not data or 'email' not in data:
+            response = make_response(jsonify({
+                "error": "Invalid payload. Please provide 'email'"
+            }))
+            response.status_code = 400
+        email = data.get('email')    
+        user = get_user_by_email(email)
+        response = make_response(jsonify({
+            "message": f"user with email: {email} retrieved successfully",
+            "data": User(
+                _id=str(user._id) if user._id else None,  # Convert ObjectId to string
+                first_name=user.first_name,
+                last_name=user.last_name,
+                email=user.email,
+                created_at=user.created_at,
+            ).to_dict()
+        }))
+        response.status_code = 200
+    except UserNotFoundError as ex:
+        response = make_response(jsonify({
+            "message" : str(ex)
+        }))
+        response.status_code = 404
+    except Exception:
+        response = make_response(jsonify({
+                "message" : "something went wrong"
+        }))
+        response.status_code = 500
+        
+    response.headers['content-type'] = 'application/json'
+    return response
+
 @api_bp.route("/users/<user_id>", methods=['GET'])    
 def get_user_by_user_id(user_id: str):
     try:
@@ -136,6 +173,7 @@ def get_user_by_user_id(user_id: str):
                     _id=str(user._id) if user._id else None,  # Convert ObjectId to string
                     first_name=user.first_name,
                     last_name=user.last_name,
+                    email=user.email,
                     created_at=user.created_at,
                 ),
                 "message": f"user with id {user_id} retieved successfully"

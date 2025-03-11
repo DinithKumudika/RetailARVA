@@ -173,7 +173,32 @@ def get_user_by_id(id: str) -> User:
         print(f"Database error while fetching user with id {id}: {pe}")
         raise pe
 
+def get_user_by_email(email: str) -> User:
+    """
+    Fetches a user from the database by their email.
 
+    Args:
+        email (str): The email of the user to fetch.
+
+    Returns:
+        User: The User object if found.
+
+    Raises:
+        UserNotFoundError: If no user is found with the given ID.
+        PyMongoError: If there is a database-related error.
+    """
+    
+    try:
+        user: Optional[dict] = db.users.find_one({"email": email})
+        if user is None:
+            print(f"No user found with email: {email}")
+            raise UserNotFoundError(email)
+        return User.from_dict(user)   
+    except PyMongoError as pe:
+        # Handle general database-related errors
+        print(f"Database error while fetching user with id {id}: {pe}")
+        raise pe
+    
 def get_chat_by_id(id: str) -> Chat:
     """
     Fetches a chat from the database by its ID.
