@@ -47,7 +47,7 @@ services:
       - ENVIRONMENT='development'
       - MONGO_HOST=mongo
       - MONGO_PORT=27017
-      - MONGO_DBNAME="retailarvadb"
+      - MONGO_DBNAME=retailarvadb
       - USE_GROQ=False
       - USE_OLLAMA=True
       - USE_GEMINI=False
