@@ -4,18 +4,18 @@ FROM python:3.11.0-slim AS builder
 # Set working directory
 WORKDIR /app
 
-# Install Poetry
-RUN pip install --no-cache-dir poetry
-
-# Install Poetry
+# Install Poetry using the official installation script
 RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Add Poetry to PATH
+ENV PATH="/root/.local/bin:${PATH}"
 
 # Copy only the files needed for Poetry to install dependencies
 COPY pyproject.toml poetry.lock ./
 
-# Install dependencies into a virtual environment
+# Install dependencies into the system Python environment
 RUN poetry config virtualenvs.create false && \
-    poetry install --no-root --no-dev --no-interaction --no-ansi
+    poetry install --no-root --only main --no-interaction --no-ansi
 
 # Create the final image
 FROM python:3.11.0-slim
@@ -24,7 +24,7 @@ FROM python:3.11.0-slim
 WORKDIR /app
 
 # Copy installed dependencies from the builder stage
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 
 # Copy the application code
 COPY run.py ./

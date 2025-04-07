@@ -5,6 +5,10 @@ git config --global user.email "dinithwalpitagama@gmail.com"
 
 git clone https://github.com/DinithKumudika/RetailARVA.git
 
+git checkout server-deployment
+
+sudo apt install docker-compose
+
 
 # If docker error occurs
 
@@ -25,3 +29,5 @@ srw-rw---- 1 root docker 0 Jan  1 00:00 /var/run/docker.sock
 ## fix permissions
 sudo chown root:docker /var/run/docker.sock
 sudo chmod 660 /var/run/docker.sock
+
+docker-compose -f docker-compose-w-ollama.yaml up -d --build
