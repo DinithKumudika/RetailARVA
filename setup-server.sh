@@ -10,21 +10,6 @@ NC='\033[0m'
 
 echo -e "${GREEN}Starting server setup script...${NC}"
 
-# Step 1: Configure Git and Clone Repository
-echo -e "${GREEN}Configuring Git...${NC}"
-git config --global user.name "dinith kumudika"
-git config --global user.email "dinithwalpitagama@gmail.com"
-
-echo -e "${GREEN}Cloning RetailARVA repository...${NC}"
-if [ -d "RetailARVA" ]; then
-    echo "Directory RetailARVA already exists. Skipping clone."
-else
-    git clone https://github.com/DinithKumudika/RetailARVA.git
-fi
-
-cd RetailARVA || { echo -e "${RED}Failed to cd into RetailARVA${NC}"; exit 1; }
-git checkout server-deployment || { echo -e "${RED}Failed to checkout server-deployment branch${NC}"; exit 1; }
-
 # Step 2: Install Docker Compose
 echo -e "${GREEN}Installing Docker Compose...${NC}"
 sudo apt update -y
