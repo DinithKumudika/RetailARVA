@@ -7,6 +7,10 @@ WORKDIR /app
 # Install Poetry using the official installation script
 #RUN curl -sSL https://install.python-poetry.org | python3 -
 
+# Upgrade pip, setuptools, and wheel
+RUN pip install --upgrade pip setuptools wheel && \
+    pip --version \
+
 # Install Poetry
 RUN pip install --no-cache-dir poetry && \
     poetry --version
