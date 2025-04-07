@@ -9,14 +9,14 @@ WORKDIR /app
 
 # Upgrade pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel && \
-    pip --version \
+    pip --version
 
 # Install Poetry
 RUN pip install --no-cache-dir poetry && \
     poetry --version
 
 # Add Poetry to PATH
-ENV PATH="/root/.local/bin:${PATH}"
+#ENV PATH="/root/.local/bin:${PATH}"
 
 # Copy only the files needed for Poetry to install dependencies
 COPY pyproject.toml poetry.lock ./
