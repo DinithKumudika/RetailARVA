@@ -5,7 +5,11 @@ FROM python:3.11.0-slim AS builder
 WORKDIR /app
 
 # Install Poetry using the official installation script
-RUN curl -sSL https://install.python-poetry.org | python3 -
+#RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Install Poetry
+RUN pip install --no-cache-dir poetry && \
+    poetry --version
 
 # Add Poetry to PATH
 ENV PATH="/root/.local/bin:${PATH}"
