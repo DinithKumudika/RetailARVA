@@ -7,6 +7,14 @@ WORKDIR /app
 # Install Poetry using the official installation script
 #RUN curl -sSL https://install.python-poetry.org | python3 -
 
+# Install system dependencies required for pyaudio
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        portaudio19-dev \
+        python3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 # Upgrade pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel && \
     pip --version
@@ -30,6 +38,12 @@ FROM python:3.11.0-slim
 
 # Set working directory
 WORKDIR /app
+
+# Install runtime dependencies for pyaudio
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        portaudio19-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy installed dependencies from the builder stage
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
