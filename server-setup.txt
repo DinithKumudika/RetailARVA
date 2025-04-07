@@ -4,7 +4,7 @@ git config --global user.name "dinith kumudika"
 git config --global user.email "dinithwalpitagama@gmail.com"
 
 git clone https://github.com/DinithKumudika/RetailARVA.git
-
+cd RetailARVA/
 git checkout server-deployment
 
 sudo apt install docker-compose
@@ -30,4 +30,12 @@ srw-rw---- 1 root docker 0 Jan  1 00:00 /var/run/docker.sock
 sudo chown root:docker /var/run/docker.sock
 sudo chmod 660 /var/run/docker.sock
 
+sudo usermod -aG docker Ubuntu
+
 docker-compose -f docker-compose-w-ollama.yaml up -d --build
+
+#open ports in Linux server
+
+sudo ufw status
+sudo ufw allow 5000/tcp
+sudo ufw allow 11434/tcp
