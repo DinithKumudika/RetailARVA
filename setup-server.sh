@@ -55,6 +55,7 @@ fi
 
 sudo ufw allow 5000/tcp || { echo -e "${RED}Failed to open port 5000${NC}"; exit 1; }
 sudo ufw allow 11434/tcp || { echo -e "${RED}Failed to open port 11434${NC}"; exit 1; }
+sudo ufw allow 27017/tcp || { echo -e "${RED}Failed to open port 27017${NC}"; exit 1; }
 echo -e "${GREEN}Firewall rules updated:${NC}"
 sudo ufw status
 
