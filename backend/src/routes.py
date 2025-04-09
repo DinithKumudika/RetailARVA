@@ -103,12 +103,18 @@ def add_new_user():
         ))
         
         user = get_user_by_id(user_id)
+        
+        print(user.first_name)
+        print(user.last_name)
+        print(user.email)
+        
         response = make_response(jsonify({
             "message": f"new user with id {str(user_id)} created",
             "data": User(
                 _id=str(user._id) if user._id else None,  # Convert ObjectId to string
                 first_name=user.first_name,
                 last_name=user.last_name,
+                email=user.email,
                 created_at=user.created_at,
             ).to_dict()
         }))
@@ -118,7 +124,8 @@ def add_new_user():
             "message" : str(ex)
         }))
         response.status_code = 404
-    except Exception:
+    except Exception as ex:
+        print(str(ex))
         response = make_response(jsonify({
                 "message" : "something went wrong"
         }))
@@ -175,7 +182,7 @@ def get_user_by_user_id(user_id: str):
                     last_name=user.last_name,
                     email=user.email,
                     created_at=user.created_at,
-                ),
+                ).to_dict(),
                 "message": f"user with id {user_id} retieved successfully"
             }))
             response.status_code = 200 
@@ -189,7 +196,8 @@ def get_user_by_user_id(user_id: str):
             "message" : str(ex)
         }))
         response.status_code = 404
-    except Exception:
+    except Exception as ex:
+        print(ex)
         response = make_response(jsonify({
                 "message" : "something went wrong"
         }))
