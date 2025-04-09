@@ -7,6 +7,8 @@ services:
     volumes:
       - mongo-data:/data/db
     container_name: RetailARVA.Mongo
+    networks: 
+      - retailARVA
   ollama:
     build:
       context: ./ollama
@@ -30,6 +32,8 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    networks: 
+      - retailARVA
   api:
     build:
       context: ./backend
