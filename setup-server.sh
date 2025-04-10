@@ -53,6 +53,7 @@ if ! sudo ufw status >/dev/null 2>&1; then
     sudo ufw enable
 fi
 
+sudo ufw allow 6334/tcp || { echo -e "${RED}Failed to open port 6334${NC}"; exit 1; }
 sudo ufw allow 5000/tcp || { echo -e "${RED}Failed to open port 5000${NC}"; exit 1; }
 sudo ufw allow 11434/tcp || { echo -e "${RED}Failed to open port 11434${NC}"; exit 1; }
 sudo ufw allow 27017/tcp || { echo -e "${RED}Failed to open port 27017${NC}"; exit 1; }
