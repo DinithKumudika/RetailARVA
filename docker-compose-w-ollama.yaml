@@ -67,7 +67,7 @@ services:
       - GROQ_API_KEY="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"
       - GROQ_MODEL_ID="llama-3.1-8b-instant"
       - HUGGINGFACE_EMBEDDING_MODEL_ID="BAAI/bge-large-en-v1.5"
-      - QDRANT_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.Z5PMRPegDxYyvVlCmkGmiLD0UuAj0WdrsqeXEMvJz_Q"
+      - QDRANT_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.BqanaVupoaZV3GGVQGA5nOdGT3kHQDzOWJZC476Ruh0"
       - QDRANT_CLUSTER_URL="https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io"
       - ELEVENLABS_API_KEY="sk_b0206ca0a7d97fa2b60ae41448b7f47e02872aec6d6cb65f"
       - GOOGLE_APPLICATION_CREDENTIALS="C:\\Users\\dinit\\Documents\\Research\\Development\\test-playground\\retailarva-6169e9007515.json"
