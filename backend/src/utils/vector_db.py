@@ -74,7 +74,7 @@ class VectorDb:
                 url=self.url,
                 api_key=self.api_key,
                 embedding=self.embeddings,
-                prefer_grpc=True
+                prefer_grpc=False
             )
             return self.vector_store
         except Exception as e:
@@ -104,7 +104,7 @@ class VectorDb:
                 docs,
                 self.embeddings,
                 url=self.url,
-                prefer_grpc=True,
+                prefer_grpc=False,
                 api_key=self.api_key,
                 collection_name=collection
             )
