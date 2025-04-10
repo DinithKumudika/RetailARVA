@@ -23,8 +23,6 @@ def get_qdrant() -> VectorDb:
     config = current_app.config
     if 'qdrant' not in g:
         try:
-            print(f"qdrant cluster url: {config.get('QDRANT_URL')}")
-            print(config.get('QDRANT_API_KEY'))
             qdrant = VectorDb(url=config.get('QDRANT_URL'), api_key=config.get('QDRANT_API_KEY'))
             qdrant.set_embedding_model()
             g.qdrant = qdrant
@@ -81,7 +79,7 @@ def create_app():
     with app.app_context():
         try:
             mongo_uri = f"mongodb://{app.config.get('MONGO_HOST')}:{app.config.get('MONGO_PORT')}/{app.config.get('MONGO_DBNAME')}"
-            print(mongo_uri)
+            print(f"mongo url: {mongo_uri}")
             mongo = PyMongo(app, uri=mongo_uri)
             app.config['MONGO'] = mongo
             g.db = mongo.db

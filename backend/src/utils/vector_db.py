@@ -67,6 +67,8 @@ class VectorDb:
             raise ValueError("Embedding model is not set. Call `set_embedding_model` first.")
         
         try:
+            print(f"qdrant url: {self.url}")
+            print(f"qdrant api key: {self.api_key}")
             self.vector_store = QdrantVectorStore.from_existing_collection(
                 collection_name=collection,
                 url=self.url,
