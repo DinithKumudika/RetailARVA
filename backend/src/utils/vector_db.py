@@ -72,6 +72,8 @@ class VectorDb:
             self.vector_store = QdrantVectorStore.from_existing_collection(
                 collection_name=collection,
                 url=self.url,
+                https=True,
+                timeout=30,
                 api_key=self.api_key,
                 embedding=self.embeddings,
                 prefer_grpc=False
@@ -105,6 +107,8 @@ class VectorDb:
                 self.embeddings,
                 url=self.url,
                 prefer_grpc=False,
+                timeout=30,
+                https=True,
                 api_key=self.api_key,
                 collection_name=collection
             )
