@@ -16,6 +16,10 @@ class VectorDb:
             url (str): The URL of the Qdrant server.
             api_key (Optional[str]): The API key for authentication (if required).
         """
+        if not url or not api_key:
+            raise ValueError("QDRANT_CLUSTER_URL and QDRANT_API_KEY are required.")
+
+
         self.embeddings = None
         self.url = url
         self.api_key = api_key
@@ -67,8 +71,9 @@ class VectorDb:
             raise ValueError("Embedding model is not set. Call `set_embedding_model` first.")
         
         try:
-            print(f"qdrant url: {self.url}")
-            print(f"qdrant api key: {self.api_key}")
+            if not self.url or not self.api_key:
+                raise ValueError("QDRANT_CLUSTER_URL and QDRANT_API_KEY are required.")
+
             self.vector_store = QdrantVectorStore.from_existing_collection(
                 collection_name=collection,
                 url=self.url,
