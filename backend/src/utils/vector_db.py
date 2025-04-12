@@ -45,6 +45,7 @@ class VectorDb:
         """
         if embedding_model:
             self.embeddings = embedding_model
+            print(f"embedding model: {self.embeddings.model}")
         else:
             rag_helper = RagHelper()
             self.embeddings = rag_helper.get_embedding_model()
@@ -80,7 +81,6 @@ class VectorDb:
                 collection_name=collection,
                 url="https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io",
                 https=True,
-                timeout=30,
                 api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.BqanaVupoaZV3GGVQGA5nOdGT3kHQDzOWJZC476Ruh0",
                 embedding=self.embeddings,
                 prefer_grpc=False
@@ -117,7 +117,6 @@ class VectorDb:
                 self.embeddings,
                 url="https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io",
                 prefer_grpc=False,
-                timeout=30,
                 https=True,
                 api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.BqanaVupoaZV3GGVQGA5nOdGT3kHQDzOWJZC476Ruh0",
                 collection_name=collection

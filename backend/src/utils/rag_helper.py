@@ -36,6 +36,7 @@ class RagHelper:
             )
             
         if eval(app.config.get('USE_OLLAMA_EMBEDDING')):
+            print(f"using ollama embedding: {app.config.get('OLLAMA_EMBEDDING_MODEL_ID')}")
             self.embeddings = OllamaEmbeddings(
                 base_url= app.config.get('OLLAMA_URL'), 
                 model= app.config.get('OLLAMA_EMBEDDING_MODEL_ID')
