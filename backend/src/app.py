@@ -27,7 +27,7 @@ def get_qdrant() -> VectorDb:
                 url=config.get('QDRANT_URL'),
                 api_key=config.get('QDRANT_API_KEY')
             )
-            qdrant.set_embedding_model()
+            qdrant.set_embedding_model(embedding_model=config.get('OLLAMA_EMBEDDING_MODEL'))
             g.qdrant = qdrant
         except Exception as e:
             current_app.logger.error(f"Failed to initialize Qdrant: {e}")
