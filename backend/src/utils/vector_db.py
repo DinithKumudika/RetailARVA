@@ -19,7 +19,6 @@ class VectorDb:
         if not url or not api_key:
             raise ValueError("QDRANT_CLUSTER_URL and QDRANT_API_KEY are required.")
 
-
         self.embeddings = None
         self.url = url
         self.api_key = api_key
@@ -69,17 +68,20 @@ class VectorDb:
         """
         if self.embeddings is None:
             raise ValueError("Embedding model is not set. Call `set_embedding_model` first.")
+
+        if not self.url or not self.api_key:
+            raise ValueError("QDRANT_CLUSTER_URL and QDRANT_API_KEY are required.")
+
+        print(f"Qdrant Api key: {self.api_key}")
+        print(f"Qdrant URL: {self.url}")
         
         try:
-            if not self.url or not self.api_key:
-                raise ValueError("QDRANT_CLUSTER_URL and QDRANT_API_KEY are required.")
-
             self.vector_store = QdrantVectorStore.from_existing_collection(
                 collection_name=collection,
-                url=self.url,
+                url="https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io",
                 https=True,
                 timeout=30,
-                api_key=self.api_key,
+                api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.BqanaVupoaZV3GGVQGA5nOdGT3kHQDzOWJZC476Ruh0",
                 embedding=self.embeddings,
                 prefer_grpc=False
             )
@@ -105,16 +107,19 @@ class VectorDb:
         """
         if self.embeddings is None:
             raise ValueError("Embedding model is not set. Call `set_embedding_model` first.")
+
+        print(f"Qdrant Api key: {self.api_key}")
+        print(f"Qdrant URL: {self.url}")
         
         try:
             qdrant = QdrantVectorStore.from_documents(
                 docs,
                 self.embeddings,
-                url=self.url,
+                url="https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io",
                 prefer_grpc=False,
                 timeout=30,
                 https=True,
-                api_key=self.api_key,
+                api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.BqanaVupoaZV3GGVQGA5nOdGT3kHQDzOWJZC476Ruh0",
                 collection_name=collection
             )
             self.vector_store = qdrant

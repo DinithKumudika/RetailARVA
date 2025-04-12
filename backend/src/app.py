@@ -23,7 +23,10 @@ def get_qdrant() -> VectorDb:
     config = current_app.config
     if 'qdrant' not in g:
         try:
-            qdrant = VectorDb(url=config.get('QDRANT_URL'), api_key=config.get('QDRANT_API_KEY'))
+            qdrant = VectorDb(
+                url=config.get('QDRANT_URL'),
+                api_key=config.get('QDRANT_API_KEY')
+            )
             qdrant.set_embedding_model()
             g.qdrant = qdrant
         except Exception as e:
