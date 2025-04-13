@@ -87,7 +87,7 @@ class VectorDb:
             )
             return self.vector_store
         except Exception as e:
-            raise ValueError(f"Failed to connect to collection '{collection}': {e}, qdrant url={self.url}, qdrant api key={self.api_key}, embeddings= {self.embeddings.model}")
+            raise ValueError(f"Failed to connect to collection '{collection}': {e}, qdrant url={self.url}, embeddings= {self.embeddings.model}")
     
     def embed_documents(self, docs : List[Document], collection: str) -> QdrantVectorStore:
         """
