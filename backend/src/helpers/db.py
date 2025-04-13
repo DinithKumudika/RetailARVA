@@ -1,6 +1,6 @@
 from src.models.models import Product, User, Chat, Message, UserProfile
 from flask import current_app as app
-from src.exceptions.exceptions import NoProductsFoundError, ProductNotFoundError, UserInsertionError, ProfileDataInsertionError, ProductInsertionError, UserNotFoundError, ChatNotFoundError, ChatCreationError, ChatUpdateError, ChatHistoryNotFoundError, MessageInsertionError
+from src.exceptions.exceptions import NoProductsFoundError, ProductNotFoundError, UserInsertionError, ProfileDataInsertionError, ProductInsertionError, UserNotFoundError, UserProfileNotFoundError, ChatNotFoundError, ChatCreationError, ChatUpdateError, ChatHistoryNotFoundError, MessageInsertionError
 from bson.objectid import ObjectId
 from typing import List, Union, Optional
 from pymongo.errors import PyMongoError, BulkWriteError
@@ -191,7 +191,16 @@ def get_user_profile_by_id(user_id: str) -> UserProfile:
             UserNotFoundError: If no user is found with the given ID.
             PyMongoError: If there is a database-related error.
         """
-    pass
+    try:
+        user_profile: Optional[dict] = db.user_profiles.find_one({"user_id": ObjectId(user_id)})
+        if user_profile is None:
+            print(f"No user profile found for user with id: {user_id}")
+            raise UserProfileNotFoundError(user_id)
+        return UserProfile.from_dict(user_profile)
+    except PyMongoError as pe:
+        # Handle general database-related errors
+        print(f"Database error while fetching user profile with user id {user_id}: {pe}")
+        raise pe
 
 def get_user_by_id(user_id: str) -> User:
     """

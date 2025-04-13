@@ -33,6 +33,12 @@ class UserNotFoundError(Exception):
     def __init__(self, user_id: str):
         self.user_id = user_id
         super().__init__(f"No user found with id: {user_id}")
+
+class UserProfileNotFoundError(Exception):
+    """Custom exception for when user profile not found in the database."""
+    def __init__(self, user_id: str):
+        self.user_id = user_id
+        super().__init__(f"No user profile found for user with id: {user_id}")
         
 class ChatNotFoundError(Exception):
     """Custom exception for when a chat is not found in the database."""

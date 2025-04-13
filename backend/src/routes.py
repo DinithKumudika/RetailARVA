@@ -5,7 +5,7 @@ from flask import jsonify, request, make_response, redirect, Blueprint, current_
 from flask_pymongo import PyMongo
 from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError
 from src.helpers.formatting import format_list
-from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile
+from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile, get_user_profile_by_id
 from src.utils.vector_db import VectorDb
 from langchain.docstore.document import Document
 from src.models.models import User, Chat, Message, UserProfile
@@ -257,6 +257,35 @@ def add_profile(user_id: str):
     response.headers['content-type'] = 'application/json'
     return response
 
+@api_bp.route("/profile/<user_id>", methods=['GET'])
+def get_user_profile(user_id: str):
+    try:
+        if user_id:
+           user = get_user_by_id(user_id)
+           user_profile = get_user_profile_by_id(str(user.id))
+           response = make_response(jsonify({
+               "data": user_profile.to_dict(),
+               "message": f"user profile with for user {user_id} retrieved successfully"
+           }))
+           response.status_code = 200
+        else:
+            response = make_response(jsonify({
+                "message": "invalid request parameter"
+            }))
+            response.status_code = 400
+    except UserNotFoundError as ex:
+        response = make_response(jsonify({
+            "message" : str(ex)
+        }))
+        response.status_code = 404
+    except Exception as ex:
+        print(ex)
+        response = make_response(jsonify({
+                "message" : "something went wrong"
+        }))
+        response.status_code = 500
+    response.headers['content-type'] = 'application/json'
+    return response
 
 @api_bp.route("/users/<user_id>", methods=['GET'])    
 def get_user_by_user_id(user_id: str):
