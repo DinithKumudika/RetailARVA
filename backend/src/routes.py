@@ -62,11 +62,13 @@ def redirect_to_gradio():
 
 @api_bp.route("/products", methods=['POST'])
 async def add_products_from_file():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(base_dir, 'data', 'products.json')
+
     try:
-        product_source_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src/data/products.json')
-        products = load_from_json(product_source_path)
+        products = load_from_json(json_path)
         # save_to_json("./src/data/products.json", products)
-        
+
         ids = add_products(products)
         
         if len(ids) > 0:
@@ -77,12 +79,13 @@ async def add_products_from_file():
             response.status_code = 201
     except FileNotFoundError:
         response = make_response(jsonify({
-                "message" : f"product info source doesn't exist"
+                "message" : f"product info source doesn't exist. {json_path}"
         }))
         response.status_code = 404        
-    except Exception:
+    except Exception as ex:
         response = make_response(jsonify({
-                "message" : f"something went wrong"
+                "message" : f"something went wrong",
+                "error": str(ex)
         }))
         response.status_code = 500
     response.headers['content-type'] = 'application/json'

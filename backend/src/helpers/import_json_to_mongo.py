@@ -82,6 +82,13 @@ def save_to_json(json_path: str, data: List[Product]):
     
 
 def load_from_json(json_file_path: str):
+    products: List[Product] = []
+
     with open(json_file_path, 'r') as f:
         products_json = json.load(f)
-    return products_json
+
+    for product_data in products_json:
+        product = Product.from_dict(product_data)
+        products.append(product)
+
+    return products

@@ -6,7 +6,7 @@ __pycache__/
 .vscode/
 .vscode
 env/         
-src/data/     
+src/data/images
 src/logs/         
 .env
 .env.example

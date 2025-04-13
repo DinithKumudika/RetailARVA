@@ -73,11 +73,6 @@ def create_app():
     app.config.from_object(OllamaConfig)
     app.config.from_object(GroqConfig)
     app.config.from_object(HuggingFaceConfig)
-        
-    os.environ["LANGSMITH_TRACING"] = app.config.get('LANGSMITH_TRACING')
-    os.environ["LANGSMITH_API_KEY"] = app.config.get('LANGSMITH_API_KEY')
-    os.environ["LANGSMITH_ENDPOINT"] = app.config.get('LANGSMITH_ENDPOINT')
-    os.environ["LANGSMITH_PROJECT"] = app.config.get('LANGSMITH_PROJECT')
 
     with app.app_context():
         try:
