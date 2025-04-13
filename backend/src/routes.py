@@ -1,15 +1,16 @@
+import os
 from typing import List
 from bson import ObjectId
 from flask import jsonify, request, make_response, redirect, Blueprint, current_app as app
 from flask_pymongo import PyMongo
 from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError
 from src.helpers.formatting import format_list
-from src.helpers.db import get_product_by_id, get_all_products, add_produts, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email
+from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email
 from src.utils.vector_db import VectorDb
 from langchain.docstore.document import Document
 from src.models.models import User, Chat, Message
 from src.utils.chatbot import Chatbot
-from src.helpers.import_json_to_mongo import load_from_csv
+from src.helpers.import_json_to_mongo import load_from_json
 from src import templates
 
 api_bp = Blueprint("api", __name__)
@@ -60,12 +61,13 @@ def redirect_to_gradio():
     return redirect(app.config.get('GRADIO_URL'), code=302)
 
 @api_bp.route("/products", methods=['POST'])
-async def add_products():
+async def add_products_from_file():
     try:
-        products = load_from_csv("./src/data/products.csv")
+        product_source_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'src/data/products.json')
+        products = load_from_json(product_source_path)
         # save_to_json("./src/data/products.json", products)
         
-        ids = add_produts(products)
+        ids = add_products(products)
         
         if len(ids) > 0:
             response = make_response(jsonify({

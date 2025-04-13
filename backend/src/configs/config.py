@@ -1,61 +1,65 @@
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 import os
 
-# env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
-# env = dotenv_values(env_path)
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
+load_dotenv(dotenv_path=env_path)
 
 class Config:
     """Base config."""
     
 class DevConfig(Config):
-    FLASK_ENV = os.environ.get('FLASK_ENV')
-    DEBUG = True
-    TESTING = True
-    DATABASE_URL = os.environ.get('DATABASE_URL')
-    NGROK_AUTH_TOKEN = os.environ.get('NGROK_AUTH_TOKEN')
-    NGROK_STATIC_DOMAIN = os.environ.get('NGROK_STATIC_DOMAIN')
-    NGROK_API_KEY = os.environ.get('NGROK_API_KEY')
-    USE_GROQ = os.environ.get('USE_GROQ')
-    USE_OLLAMA = os.environ.get('USE_OLLAMA')
-    USE_GEMINI = os.environ.get('USE_GEMINI')
-    USE_HUGGINGFACE_EMBEDDING = os.environ.get('USE_HUGGINGFACE_EMBEDDING')
-    USE_GOOGLE_EMBEDDING = os.environ.get('USE_GOOGLE_EMBEDDING')
-    USE_OLLAMA_EMBEDDING = os.environ.get('USE_OLLAMA_EMBEDDING')
-    
+    FLASK_ENV = os.getenv('FLASK_ENV', 'development')
+    DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+    TESTING = os.getenv('TESTING', 'True').lower() == 'true'
+    DATABASE_URL = os.getenv('DATABASE_URL')
+
+    # Ngrok configurations
+    NGROK_AUTH_TOKEN = os.getenv('NGROK_AUTH_TOKEN')
+    NGROK_STATIC_DOMAIN = os.getenv('NGROK_STATIC_DOMAIN')
+    NGROK_API_KEY = os.getenv('NGROK_API_KEY')
+
+    # Model usage flags
+    USE_GROQ = os.getenv('USE_GROQ', 'False').lower() == 'true'
+    USE_OLLAMA = os.getenv('USE_OLLAMA', 'False').lower() == 'true'
+    USE_GEMINI = os.getenv('USE_GEMINI', 'False').lower() == 'true'
+    USE_HUGGINGFACE_EMBEDDING = os.getenv('USE_HUGGINGFACE_EMBEDDING', 'False').lower() == 'true'
+    USE_GOOGLE_EMBEDDING = os.getenv('USE_GOOGLE_EMBEDDING', 'False').lower() == 'true'
+    USE_OLLAMA_EMBEDDING = os.getenv('USE_OLLAMA_EMBEDDING', 'False').lower() == 'true'
+
 class MongoConfig(Config):
-    MONGO_HOST = os.environ.get('MONGO_HOST')
-    MONGO_PORT = os.environ.get('MONGO_PORT')
-    MONGO_USERNAME = os.environ.get('MONGO_USERNAME')
-    MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')
-    MONGO_DBNAME = os.environ.get('MONGO_DBNAME')
+    MONGO_HOST = os.getenv('MONGO_HOST')
+    MONGO_PORT = os.getenv('MONGO_PORT')
+    MONGO_USERNAME = os.getenv('MONGO_USERNAME')
+    MONGO_PASSWORD = os.getenv('MONGO_PASSWORD')
+    MONGO_DBNAME = os.getenv('MONGO_DBNAME')
 
 class QdrantConfig(Config):
-    QDRANT_URL = os.environ.get('QDRANT_CLUSTER_URL')
-    QDRANT_API_KEY = os.environ.get('QDRANT_API_KEY')
+    QDRANT_URL = os.getenv('QDRANT_CLUSTER_URL')
+    QDRANT_API_KEY = os.getenv('QDRANT_API_KEY')
 
 class GradioConfig(Config):
-    GRADIO_URL = os.environ.get('GRADIO_URL')
-    GRADIO_PORT = os.environ.get('GRADIO_PORT')
+    GRADIO_URL = os.getenv('GRADIO_URL', 'http://127.0.0.1:7860')
+    GRADIO_PORT = os.getenv('GRADIO_PORT', '7860')
 
 class OllamaConfig(Config):
-    OLLAMA_URL = os.environ.get('OLLAMA_URL')
-    OLLAMA_MODEL_ID = os.environ.get('OLLAMA_MODEL_ID')
-    OLLAMA_EMBEDDING_MODEL_ID = os.environ.get('OLLAMA_EMBEDDING_MODEL_ID')
+    OLLAMA_URL = os.getenv('OLLAMA_URL')
+    OLLAMA_MODEL_ID = os.getenv('OLLAMA_MODEL_ID')
+    OLLAMA_EMBEDDING_MODEL_ID = os.getenv('OLLAMA_EMBEDDING_MODEL_ID')
 
 class GoogleConfig(Config):
-    GOOGLE_GENERATIVE_LANGUAGE_API_KEY = os.environ.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY')
-    GEMINI_MODEL_ID = os.environ.get('GEMINI_MODEL_ID')
-    GEMINI_EMBEDDING_MODEL_ID = os.environ.get('GEMINI_EMBEDDING_MODEL_ID')
+    GOOGLE_GENERATIVE_LANGUAGE_API_KEY = os.getenv('GOOGLE_GENERATIVE_LANGUAGE_API_KEY')
+    GEMINI_MODEL_ID = os.getenv('GEMINI_MODEL_ID')
+    GEMINI_EMBEDDING_MODEL_ID = os.getenv('GEMINI_EMBEDDING_MODEL_ID')
 
 class GroqConfig(Config):
-    GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
-    GROQ_MODEL_ID = os.environ.get('GROQ_MODEL_ID')
+    GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+    GROQ_MODEL_ID = os.getenv('GROQ_MODEL_ID', 'llama-3.1-8b-instant')
 
 class HuggingFaceConfig(Config):
-    HUGGINGFACE_EMBEDDING_MODEL_ID = os.environ.get('HUGGINGFACE_EMBEDDING_MODEL_ID')
+    HUGGINGFACE_EMBEDDING_MODEL_ID = os.getenv('HUGGINGFACE_EMBEDDING_MODEL_ID', 'BAAI/bge-large-en-v1.5')
     
 class LangsmithConfig(Config):
-    LANGSMITH_TRACING = os.environ.get('LANGSMITH_TRACING')
-    LANGSMITH_ENDPOINT = os.environ.get('LANGSMITH_ENDPOINT')
-    LANGSMITH_API_KEY = os.environ.get('LANGSMITH_API_KEY')
-    LANGSMITH_PROJECT = os.environ.get('LANGSMITH_PROJECT')
+    LANGSMITH_TRACING = os.getenv('LANGSMITH_TRACING', 'False').lower() == 'true'
+    LANGSMITH_ENDPOINT = os.getenv('LANGSMITH_ENDPOINT', 'https://api.smith.langchain.com')
+    LANGSMITH_API_KEY = os.getenv('LANGSMITH_API_KEY')
+    LANGSMITH_PROJECT = os.getenv('LANGSMITH_PROJECT', 'retailarva-chatbot')

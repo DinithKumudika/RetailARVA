@@ -80,15 +80,8 @@ def save_to_json(json_path: str, data: List[Product]):
     with open(json_path, 'r') as f:
         json.dump(data, f)
     
-    
-# def import_json_to_mongo(db_name, collection_name, json_path):
-#     mongo_uri = f"mongodb://{db_config.MONGO_USERNAME}:{db_config.MONGO_PASSWORD}@{db_config.MONGO_HOST}:{db_config.MONGO_PORT}/"
-#     print(mongo_uri)
-#     client = MongoClient(mongo_uri)
-#     db = client[db_name]
 
-#     with open(json_path, 'r') as f:
-#         data = json.load(f)
-#         db[collection_name].insert_many(data)
-
-#     client.close()
+def load_from_json(json_file_path: str):
+    with open(json_file_path, 'r') as f:
+        products_json = json.load(f)
+    return products_json

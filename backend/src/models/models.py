@@ -3,29 +3,33 @@ from bson.objectid import ObjectId
 
 class Product:
     def __init__(
-        self,
-        product_id: int,
-        name: str,
-        brand: str,
-        category: str,
-        price: float,
-        ingredients: list,
-        key_ingredients: list,
-        benefits: str,
-        is_natural: bool,
-        concentrations: str,
-        usage: str,
-        application_tips: str,
-        skin_types: str,
-        skin_concerns: list,
-        allergens: list | None = None,
-        side_effects: str | None = None,
-        sensitivities: str| None = None,
-        _id=None,
+            self,
+            product_id: int,
+            name: str,
+            brand: str,
+            category: str,
+            price: float,
+            ingredients: list,
+            key_ingredients: list,
+            benefits: list,
+            is_natural: bool,
+            concentrations: list,
+            usage: str,
+            application_tips: str,
+            skin_types: list,
+            skin_concerns: list,
+            average_rating: float,
+            customer_reviews: list,
+            expert_review: str,
+            claims: list,
+            for_sensitive_skin: str,
+            allergens: list | None = None,
+            side_effects: list | None = None,
+            _id=None,
     ):
         self._id = _id if _id else ObjectId()
-        self.name = name
         self.id = product_id
+        self.name = name
         self.brand = brand
         self.category = category
         self.price = price
@@ -40,7 +44,11 @@ class Product:
         self.skin_types = skin_types
         self.skin_concerns = skin_concerns
         self.allergens = allergens
-        self.sensitivities = sensitivities
+        self.average_rating = average_rating
+        self.customer_reviews = customer_reviews
+        self.expert_review = expert_review
+        self.claims = claims
+        self.for_sensitive_skin = for_sensitive_skin
 
     def to_dict(self):
         """
@@ -48,8 +56,8 @@ class Product:
         """
         return {
             "_id": self._id,
-            "name": self.name,
             "product_id": self.id,
+            "name": self.name,
             "brand": self.brand,
             "category": self.category,
             "price": self.price,
@@ -64,7 +72,11 @@ class Product:
             "skin_types": self.skin_types,
             "skin_concerns": self.skin_concerns,
             "allergens": self.allergens,
-            "sensitivities": self.sensitivities,
+            "average_rating": self.average_rating,
+            "customer_reviews": self.customer_reviews,
+            "expert_review": self.expert_review,
+            "claims": self.claims,
+            "for_sensitive_skin": self.for_sensitive_skin,
         }
 
     @staticmethod
@@ -72,63 +84,37 @@ class Product:
         """
         Creates a Product object from a dictionary (e.g., retrieved from MongoDB).
         """
-        print(data.get("product_id"))
         return Product(
             _id=data.get("_id"),
-            product_id=data.get("product_id"),
-            name=data.get("name"),
-            brand=data.get("brand"),
-            category=data.get("category"),
+            product_id=data.get("product_id", data.get("Id")),  # Handle JSON's "Id" field
+            name=data.get("name", data.get("Name")),  # Handle JSON's "Name" field
+            brand=data.get("brand", data.get("Brand")),  # Handle JSON's "Brand" field
+            category=data.get("category", data.get("Category")),  # Handle JSON's "Category" field
             price=data.get("price"),
-            ingredients=data.get("ingredients"),
-            key_ingredients=data.get("key_ingredients"),
-            benefits=data.get("benefits"),
-            side_effects=data.get("side_effects"),
-            is_natural=data.get("is_natural"),
-            concentrations=data.get("concentrations"),
-            usage=data.get("usage"),
-            application_tips=data.get("application_tips"),
-            skin_types=data.get("skin_types"),
-            skin_concerns=data.get("skin_concerns"),
-            allergens=data.get("allergens"),
-            sensitivities=data.get("sensitivities"),
+            ingredients=data.get("ingredients", data.get("Ingredients")),  # Handle JSON's "Ingredients"
+            key_ingredients=data.get("key_ingredients", data.get("Key Ingredients")),  # Handle JSON's "Key Ingredients"
+            benefits=data.get("benefits", data.get("Benefits")),  # Handle JSON's "Benefits"
+            side_effects=data.get("side_effects", data.get("Potential Side Effects")),
+            # Handle JSON's "Potential Side Effects"
+            is_natural=data.get("is_natural", data.get("Natural")),  # Handle JSON's "Natural"
+            concentrations=data.get("concentrations", data.get("Concentrations")),  # Handle JSON's "Concentrations"
+            usage=data.get("usage", data.get("Usage")),  # Handle JSON's "Usage"
+            application_tips=data.get("application_tips", data.get("Application Tips")),
+            # Handle JSON's "Application Tips"
+            skin_types=data.get("skin_types", data.get("Skin Type")),  # Handle JSON's "Skin Type"
+            skin_concerns=data.get("skin_concerns", data.get("Skin Concerns")),  # Handle JSON's "Skin Concerns"
+            allergens=data.get("allergens", data.get("Allergens")),  # Handle JSON's "Allergens"
+            average_rating=data.get("average_rating", data.get("Average Rating")),  # Handle JSON's "Average Rating"
+            customer_reviews=data.get("customer_reviews", data.get("Customer Reviews")),
+            # Handle JSON's "Customer Reviews"
+            expert_review=data.get("expert_review", data.get("Expert Review")),  # Handle JSON's "Expert Review"
+            claims=data.get("claims", data.get("Claims")),  # Handle JSON's "Claims"
+            for_sensitive_skin=data.get("for_sensitive_skin", data.get("For Sensitive Skin")),
+            # Handle JSON's "For Sensitive Skin"
         )
 
     def __repr__(self):
         return f"Product(name='{self.name}', brand='{self.brand}', category='{self.category}')"
-
-class CustomerReview:
-    def __init__(self, product_id, review, rating, _id=None):
-        self._id = _id if _id else ObjectId()
-        self.product_id = ObjectId(product_id) 
-        self.review = review
-        self.rating = rating
-
-    def to_dict(self):
-        """
-        Converts the CustomerReview object into a dictionary for MongoDB.
-        """
-        return {
-            "_id": self._id,
-            "product_id": self.product_id,
-            "review": self.review,
-            "rating": self.rating,
-        }
-
-    @staticmethod
-    def from_dict(data):
-        """
-        Creates a CustomerReview object from a dictionary (e.g., retrieved from MongoDB).
-        """
-        return CustomerReview(
-            _id=data.get("_id"),
-            product_id=data.get("product_id"),
-            review=data.get("review"),
-            rating=data.get("rating"),
-        )
-
-    def __repr__(self):
-        return f"CustomerReview(product_id='{self.product_id}', rating={self.rating})"       
     
 class User:
     def __init__(self, first_name : str, last_name : str, email: str, _id=None, created_at=None):

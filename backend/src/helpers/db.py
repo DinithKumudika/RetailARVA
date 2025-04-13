@@ -40,7 +40,7 @@ def add_produt(product: Product) -> ObjectId:
         print(f"Database error while adding product: {e}")
         raise PyMongoError(f"Database error while adding product: {e}")
 
-def add_produts(products: list[Product]) -> ObjectId:
+def add_products(products: list[Product]) -> ObjectId:
     """
     Adds multiple products to the database.
 
