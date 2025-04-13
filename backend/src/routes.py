@@ -91,6 +91,36 @@ async def add_products_from_file():
     response.headers['content-type'] = 'application/json'
     return response
 
+
+@api_bp.route("/products/<product_id>", methods=['GET'])
+def get_product_by_product_id(product_id: int):
+    try:
+        if product_id:
+            product = get_product_by_id(product_id)
+            response = make_response(jsonify({
+                "data": product.to_dict(),
+                "message": "product retieved successfully"
+            }))
+            response.status_code = 200
+        else:
+            response = make_response(jsonify({
+                "message": "invalid request parameter"
+            }))
+            response.status_code = 400
+    except ProductNotFoundError as ex:
+        response = make_response(jsonify({
+            "message": str(ex)
+        }))
+        response.status_code = 404
+    except Exception:
+        response = make_response(jsonify({
+            "message": "something went wrong"
+        }))
+        response.status_code = 500
+
+    response.headers['content-type'] = 'application/json'
+    return response
+
 @api_bp.route("/users", methods=['POST'])
 def add_new_user():
     try:
@@ -207,35 +237,6 @@ def get_user_by_user_id(user_id: str):
                 "message" : "something went wrong"
         }))
         response.status_code = 500
-    response.headers['content-type'] = 'application/json'
-    return response   
-
-@api_bp.route("/products/<product_id>", methods=['GET'])
-def get_product_by_product_id(product_id: int):
-    try:
-        if product_id:
-            product = get_product_by_id(product_id)
-            response = make_response(jsonify({
-                "data" : product.to_dict(),
-                "message": "product retieved successfully"
-            }))
-            response.status_code = 200
-        else:
-            response = make_response(jsonify({
-                "message" : "invalid request parameter"
-            }))
-            response.status_code = 400
-    except ProductNotFoundError as ex:
-        response = make_response(jsonify({
-                "message" : str(ex)
-            }))
-        response.status_code = 404
-    except Exception:
-        response = make_response(jsonify({
-                "message" : "something went wrong"
-        }))
-        response.status_code = 500    
-    
     response.headers['content-type'] = 'application/json'
     return response
 
