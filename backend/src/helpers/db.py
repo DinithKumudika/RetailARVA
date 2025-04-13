@@ -191,6 +191,7 @@ def get_user_profile_by_id(user_id: str) -> UserProfile:
             UserNotFoundError: If no user is found with the given ID.
             PyMongoError: If there is a database-related error.
         """
+    pass
 
 def get_user_by_id(user_id: str) -> User:
     """
