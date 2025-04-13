@@ -5,10 +5,10 @@ from flask import jsonify, request, make_response, redirect, Blueprint, current_
 from flask_pymongo import PyMongo
 from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError
 from src.helpers.formatting import format_list
-from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email
+from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile
 from src.utils.vector_db import VectorDb
 from langchain.docstore.document import Document
-from src.models.models import User, Chat, Message
+from src.models.models import User, Chat, Message, UserProfile
 from src.utils.chatbot import Chatbot
 from src.helpers.import_json_to_mongo import load_from_json
 from src import templates
@@ -137,7 +137,7 @@ def add_new_user():
             email=data.get('email')
         ))
         
-        user = get_user_by_id(user_id)
+        user = get_user_by_id(str(user_id))
         
         print(user.first_name)
         print(user.last_name)
@@ -146,7 +146,7 @@ def add_new_user():
         response = make_response(jsonify({
             "message": f"new user with id {str(user_id)} created",
             "data": User(
-                _id=str(user._id) if user._id else None,  # Convert ObjectId to string
+                _id=str(user.id) if user.id else None,  # Convert ObjectId to string
                 first_name=user.first_name,
                 last_name=user.last_name,
                 email=user.email,
@@ -183,7 +183,7 @@ def login_user():
         response = make_response(jsonify({
             "message": f"user with email: {email} retrieved successfully",
             "data": User(
-                _id=str(user._id) if user._id else None,  # Convert ObjectId to string
+                _id=str(user.id) if user.id else None,  # Convert ObjectId to string
                 first_name=user.first_name,
                 last_name=user.last_name,
                 email=user.email,
@@ -196,7 +196,8 @@ def login_user():
             "message" : str(ex)
         }))
         response.status_code = 404
-    except Exception:
+    except Exception as ex:
+        print(str(ex))
         response = make_response(jsonify({
                 "message" : "something went wrong"
         }))
@@ -205,6 +206,58 @@ def login_user():
     response.headers['content-type'] = 'application/json'
     return response
 
+@api_bp.route("/profile/<user_id>", methods=['POST'])
+def add_profile(user_id: str):
+    try:
+        if user_id:
+            data = request.get_json()
+            if not data or 'profileData' not in data:
+                response = make_response(jsonify({
+                    "error": "Invalid payload."
+                }))
+                response.status_code = 400
+            profile_data = data.get('profileData')
+            user = get_user_by_id(user_id)
+
+            user_profile = UserProfile(
+                user_id=user.id,
+                age=profile_data.get('age'),
+                gender=profile_data.get('gender'),
+                skin_type=profile_data.get('skinType'),
+                sensitive_skin=True if profile_data.get('sensitiveSkin') == "Yes" else False,
+                skin_concerns=profile_data.get('skinConcerns'),
+                ingredients_to_avoid=profile_data.get('ingredientsToAvoid'),
+                known_allergies=profile_data.get('knownAllergies'),
+                min_price=profile_data.get('minPrice'),
+                max_price=profile_data.get('maxPrice'),
+                preferences=profile_data.get('preferences')
+            )
+            user_profile_id = add_user_profile(user_profile)
+
+            response = make_response(jsonify({
+                "message": f"new user profile with id {str(user_profile_id)} created",
+            }))
+            response.status_code = 201
+        else:
+            response = make_response(jsonify({
+                "message" : "invalid request parameter"
+            }))
+            response.status_code = 400
+    except UserNotFoundError as ex:
+        response = make_response(jsonify({
+                "message" : str(ex)
+        }))
+        response.status_code = 404
+    except Exception as ex:
+        print(ex)
+        response = make_response(jsonify({
+            "message": "something went wrong"
+        }))
+        response.status_code = 500
+    response.headers['content-type'] = 'application/json'
+    return response
+
+
 @api_bp.route("/users/<user_id>", methods=['GET'])    
 def get_user_by_user_id(user_id: str):
     try:
@@ -212,7 +265,7 @@ def get_user_by_user_id(user_id: str):
             user = get_user_by_id(user_id)
             response = make_response(jsonify({
                 "data" : User(
-                    _id=str(user._id) if user._id else None,  # Convert ObjectId to string
+                    _id=str(user.id) if user.id else None,  # Convert ObjectId to string
                     first_name=user.first_name,
                     last_name=user.last_name,
                     email=user.email,

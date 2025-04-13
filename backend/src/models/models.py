@@ -1,5 +1,6 @@
 from datetime import datetime
 from bson.objectid import ObjectId
+from src.enums import Gender
 
 class Product:
     def __init__(
@@ -27,7 +28,7 @@ class Product:
             side_effects: list | None = None,
             _id=None,
     ):
-        self._id = _id if _id else ObjectId()
+        self.id = _id if _id else ObjectId()
         self.product_id = product_id
         self.name = name
         self.brand = brand
@@ -55,7 +56,7 @@ class Product:
         Converts the Product object into a dictionary for MongoDB.
         """
         return {
-            "_id": self._id,
+            "_id": self.id,
             "product_id": self.product_id,
             "name": self.name,
             "brand": self.brand,
@@ -118,7 +119,7 @@ class Product:
     
 class User:
     def __init__(self, first_name : str, last_name : str, email: str, _id=None, created_at=None):
-        self._id = _id if _id else ObjectId()
+        self.id = _id if _id else ObjectId()
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
@@ -129,7 +130,7 @@ class User:
         Converts the User object into a dictionary for MongoDB.
         """
         return {
-            "_id": self._id,
+            "_id": self.id,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
@@ -152,9 +153,69 @@ class User:
     def __repr__(self):
         return f"User(first_name='{self.first_name}', last_name='{self.last_name}', email='{self.email}')"
 
+class UserProfile:
+    def __init__(self, user_id: str, age: int, gender: str, skin_type: str, sensitive_skin: bool, skin_concerns: list[str], ingredients_to_avoid: list[str], known_allergies: list[str], min_price: float, max_price: float, preferences: list[str], _id = None, created_at = None):
+        self.id = _id if _id else ObjectId()
+        self.user_id = ObjectId(user_id)
+        self.created_at = created_at if created_at else datetime.utcnow()
+        self.age = age
+        self.gender =  Gender.MALE.value if gender == "Male" else Gender.FEMALE.value
+        self.skin_type = skin_type
+        self.sensitive_skin = sensitive_skin
+        self.skin_concerns = skin_concerns
+        self.ingredients_to_avoid = ingredients_to_avoid
+        self.known_allergies = known_allergies
+        self.min_price = min_price
+        self.max_price = max_price
+        self.preferences = preferences
+
+    def to_dict(self):
+        """
+        Converts the UserProfile object into a dictionary for MongoDB.
+        """
+        return {
+            "_id": self.id,
+            "user_id": self.user_id,
+            "age": self.age,
+            "gender": self.gender,
+            "skin_type": self.skin_type,
+            "sensitive_skin": self.sensitive_skin,
+            "skin_concerns": self.skin_concerns,
+            "ingredients_to_avoid": self.ingredients_to_avoid,
+            "known_allergies": self.known_allergies,
+            "min_price": self.min_price,
+            "max_price": self.max_price,
+            "preferences": self.preferences,
+            "created_at": self.created_at
+        }
+
+    @staticmethod
+    def from_dict(data):
+        """
+        Creates a UserProfile object from a dictionary (e.g., retrieved from MongoDB).
+        """
+        return UserProfile(
+            _id=data.get("_id"),
+            user_id=data.get("user_id"),
+            age=data.get("age"),
+            gender=data.get("gender"),
+            skin_type=data.get("skin_type"),
+            sensitive_skin=data.get("sensitive_skin"),
+            skin_concerns=data.get("skin_concerns"),
+            ingredients_to_avoid=data.get("ingredients_to_avoid"),
+            known_allergies=data.get("known_allergies"),
+            min_price=data.get("min_price"),
+            max_price=data.get("max_price"),
+            preferences=data.get("preferences"),
+            created_at=data.get("created_at")
+        )
+
+    def __repr__(self):
+        return f"UserProfile(_id='{self.id}', user_id='{self.user_id}')"
+
 class Chat:
     def __init__(self, user_id: str, messages_count: int = 0, _id=None, created_at=None):
-        self._id: ObjectId = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
+        self.id: ObjectId = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
         self.user_id: ObjectId = ObjectId(user_id)
         self.messages_count: int = messages_count
         self.created_at = created_at if created_at else datetime.utcnow()  # Timestamp for creation
@@ -164,7 +225,7 @@ class Chat:
         Converts the Chat object into a dictionary for MongoDB.
         """
         return {
-            "_id": self._id,
+            "_id": self.id,
             "user_id": self.user_id,
             "messages_count": self.messages_count,
             "created_at": self.created_at
@@ -183,12 +244,12 @@ class Chat:
         )
 
     def __repr__(self):
-        return f"Chat(_id='{self._id}', user_id='{self.user_id}', messages_count={self.messages_count})"
+        return f"Chat(_id='{self.id}', user_id='{self.user_id}', messages_count={self.messages_count})"
         
 
 class Message:
     def __init__(self, chat_id: ObjectId, role: str, content: str, message_id: int, _id=None):
-        self._id: ObjectId = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
+        self.id: ObjectId = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
         self.chat_id: ObjectId = chat_id  # Reference to the parent chat
         self.message_id: int = message_id
         self.role: str = role
@@ -199,7 +260,7 @@ class Message:
         Converts the Message object into a dictionary for MongoDB.
         """
         return {
-            "_id": self._id,
+            "_id": self.id,
             "chat_id": self.chat_id,
             "role": self.role,
             "message_id": self.message_id,

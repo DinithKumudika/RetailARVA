@@ -1,6 +1,6 @@
-from src.models.models import Product, User, Chat, Message
+from src.models.models import Product, User, Chat, Message, UserProfile
 from flask import current_app as app
-from src.exceptions.exceptions import NoProductsFoundError, ProductNotFoundError, UserInsertionError, ProductInsertionError, UserNotFoundError, ChatNotFoundError, ChatCreationError, ChatUpdateError, ChatHistoryNotFoundError, MessageInsertionError
+from src.exceptions.exceptions import NoProductsFoundError, ProductNotFoundError, UserInsertionError, ProfileDataInsertionError, ProductInsertionError, UserNotFoundError, ChatNotFoundError, ChatCreationError, ChatUpdateError, ChatHistoryNotFoundError, MessageInsertionError
 from bson.objectid import ObjectId
 from typing import List, Union, Optional
 from pymongo.errors import PyMongoError, BulkWriteError
@@ -148,12 +148,41 @@ def add_user(user: User) -> ObjectId:
         print(f"Database error while adding user: {pe}")
         raise pe
 
-def get_user_by_id(id: str) -> User:
+def add_user_profile(profile_data: UserProfile):
+    """
+    Adds a profile data of a user.
+
+    Args:
+        profile_data (UserProfile): The user profile object to be added.
+    Returns:
+        ObjectId: The _id of the inserted user profile.
+
+    Raises:
+        ValueError: If the input is invalid or cannot be converted to a dictionary.
+        ProfileDataInsertionError: If the insertion is not acknowledged by the database.
+        PyMongoError: If there is a database-related error.
+    """
+    try:
+        result = db.user_profiles.insert_one(profile_data.to_dict())
+        if not result.acknowledged:
+            print("user profile insertion failed")
+            raise ProfileDataInsertionError()
+        return result.inserted_id
+    except AttributeError as e:
+        # Handle cases where user.to_dict() fails
+        print(f"Invalid user object: {e}")
+        raise ValueError(f"Failed to convert user to a dictionary: {e}")
+    except PyMongoError as pe:
+        # Handle general database-related errors
+        print(f"Database error while adding user: {pe}")
+        raise pe
+
+def get_user_by_id(user_id: str) -> User:
     """
     Fetches a user from the database by their ID.
 
     Args:
-        id (str): The ID of the user to fetch.
+        user_id (str): The ID of the user to fetch.
 
     Returns:
         User: The User object if found.
@@ -163,10 +192,10 @@ def get_user_by_id(id: str) -> User:
         PyMongoError: If there is a database-related error.
     """
     try:
-        user: Optional[dict] = db.users.find_one({"_id": ObjectId(id)})
+        user: Optional[dict] = db.users.find_one({"_id": ObjectId(user_id)})
         if user is None:
-            print(f"No user found with id: {id}")
-            raise UserNotFoundError(id)
+            print(f"No user found with id: {user_id}")
+            raise UserNotFoundError(user_id)
         return User.from_dict(user)   
     except PyMongoError as pe:
         # Handle general database-related errors

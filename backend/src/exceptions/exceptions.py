@@ -15,6 +15,12 @@ class UserInsertionError(Exception):
     def __init__(self, message: str="User insertion failed: Operation not acknowledged."):
         self.message = message
         super().__init__(self.message)
+
+class ProfileDataInsertionError(Exception):
+    """Custom exception for errors during profile data insertion."""
+    def __init__(self, message: str="Profile data insertion failed: Operation not acknowledged."):
+        self.message = message
+        super().__init__(self.message)
         
 class ProductInsertionError(Exception):
     """Custom exception for errors during product insertion."""
