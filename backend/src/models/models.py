@@ -28,7 +28,7 @@ class Product:
             _id=None,
     ):
         self._id = _id if _id else ObjectId()
-        self.id = product_id
+        self.product_id = product_id
         self.name = name
         self.brand = brand
         self.category = category
@@ -56,7 +56,7 @@ class Product:
         """
         return {
             "_id": self._id,
-            "product_id": self.id,
+            "product_id": self.product_id,
             "name": self.name,
             "brand": self.brand,
             "category": self.category,

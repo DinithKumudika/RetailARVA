@@ -93,10 +93,10 @@ async def add_products_from_file():
 
 
 @api_bp.route("/products/<product_id>", methods=['GET'])
-def get_product_by_product_id(product_id: int):
+def get_product_by_product_id(product_id: str):
     try:
         if product_id:
-            product = get_product_by_id(product_id)
+            product = get_product_by_id(int(product_id))
             response = make_response(jsonify({
                 "data": product.to_dict(),
                 "message": "product retieved successfully"
