@@ -88,6 +88,7 @@ def load_from_json(json_file_path: str):
         products_json = json.load(f)
 
     for product_data in products_json:
+        product_data['Price'] = float(product_data['Price'].replace("Rs ", "").replace(",", ""))
         product = Product.from_dict(product_data)
         products.append(product)
 
