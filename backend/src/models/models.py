@@ -91,7 +91,7 @@ class Product:
             name=data.get("name", data.get("Name")),  # Handle JSON's "Name" field
             brand=data.get("brand", data.get("Brand")),  # Handle JSON's "Brand" field
             category=data.get("category", data.get("Category")),  # Handle JSON's "Category" field
-            price=data.get("price"),
+            price=data.get("price", data.get("Price")),
             ingredients=data.get("ingredients", data.get("Ingredients")),  # Handle JSON's "Ingredients"
             key_ingredients=data.get("key_ingredients", data.get("Key Ingredients")),  # Handle JSON's "Key Ingredients"
             benefits=data.get("benefits", data.get("Benefits")),  # Handle JSON's "Benefits"

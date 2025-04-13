@@ -177,6 +177,21 @@ def add_user_profile(profile_data: UserProfile):
         print(f"Database error while adding user: {pe}")
         raise pe
 
+def get_user_profile_by_id(user_id: str) -> UserProfile:
+    """
+        Fetches a user profile from the database by user ID.
+
+        Args:
+            user_id (str): The ID of the user to fetch.
+
+        Returns:
+            UserProfile: The UserProfile object if found.
+
+        Raises:
+            UserNotFoundError: If no user is found with the given ID.
+            PyMongoError: If there is a database-related error.
+        """
+
 def get_user_by_id(user_id: str) -> User:
     """
     Fetches a user from the database by their ID.
