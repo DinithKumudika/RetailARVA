@@ -3,7 +3,7 @@ from typing import List
 from bson import ObjectId
 from flask import jsonify, request, make_response, redirect, Blueprint, current_app as app
 from flask_pymongo import PyMongo
-from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError
+from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError,UserProfileNotFoundError
 from src.helpers.formatting import format_list
 from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile, get_user_profile_by_id, get_user_profile_by_user_id, update_user_profile
 from src.utils.vector_db import VectorDb
@@ -278,6 +278,11 @@ def get_user_profile(user_id: str):
             "message" : str(ex)
         }))
         response.status_code = 404
+    except UserProfileNotFoundError as ex:
+        response = make_response(jsonify({
+            "message" : f"User profile for user {user_id} not found"
+        }))
+        response.status_code = 404  # Profile not found should return 404
     except Exception as ex:
         print(ex)
         response = make_response(jsonify({
