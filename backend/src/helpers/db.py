@@ -403,5 +403,40 @@ def add_chat_message(message: Message) -> ObjectId:
         print(f"Database error while inserting message: {pe}")
         raise pe
     
-    
-    
+def get_user_profile_by_user_id(user_id: str) -> Optional[UserProfile]:
+    try:
+        profile_data = db.user_profiles.find_one({"user_id": ObjectId(user_id)})
+
+        if profile_data is None:
+            print(f"No profile found for user_id: {user_id}")
+            return None  # Profile doesn't exist
+
+        return UserProfile.from_dict(profile_data)
+
+    except PyMongoError as pe:
+        print(f"Database error while fetching profile for user_id {user_id}: {pe}")
+        raise
+
+def update_user_profile(user_profile: UserProfile) -> None:
+    try:
+        if not user_profile.id:
+            raise ValueError("UserProfile must have an id to be updated.")
+
+        update_data = user_profile.to_dict()
+        update_data.pop('_id', None)
+
+        result = db.user_profiles.update_one(
+            {"_id": ObjectId(user_profile.id)},
+            {"$set": update_data}
+        )
+
+        if result.matched_count == 0:
+            print(f"No user profile found with id: {user_profile.id}")
+            raise UserNotFoundError(user_profile.id)
+
+        print(f"Updated profile with id: {user_profile.id}")
+
+    except PyMongoError as pe:
+        print(f"Database error while updating profile: {pe}")
+        raise
+ 

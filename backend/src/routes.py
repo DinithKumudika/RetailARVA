@@ -3,9 +3,9 @@ from typing import List
 from bson import ObjectId
 from flask import jsonify, request, make_response, redirect, Blueprint, current_app as app
 from flask_pymongo import PyMongo
-from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError
+from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError,UserProfileNotFoundError
 from src.helpers.formatting import format_list
-from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile, get_user_profile_by_id
+from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile, get_user_profile_by_id, get_user_profile_by_user_id, update_user_profile
 from src.utils.vector_db import VectorDb
 from langchain.docstore.document import Document
 from src.models.models import User, Chat, Message, UserProfile
@@ -206,56 +206,56 @@ def login_user():
     response.headers['content-type'] = 'application/json'
     return response
 
-@api_bp.route("/profile/<user_id>", methods=['POST'])
-def add_profile(user_id: str):
-    try:
-        if user_id:
-            data = request.get_json()
-            if not data or 'profileData' not in data:
-                response = make_response(jsonify({
-                    "error": "Invalid payload."
-                }))
-                response.status_code = 400
-            profile_data = data.get('profileData')
-            user = get_user_by_id(user_id)
+# @api_bp.route("/profile/<user_id>", methods=['POST'])
+# def add_profile(user_id: str):
+#     try:
+#         if user_id:
+#             data = request.get_json()
+#             if not data or 'profileData' not in data:
+#                 response = make_response(jsonify({
+#                     "error": "Invalid payload."
+#                 }))
+#                 response.status_code = 400
+#             profile_data = data.get('profileData')
+#             user = get_user_by_id(user_id)
 
-            user_profile = UserProfile(
-                user_id=user.id,
-                age=profile_data.get('age'),
-                gender=profile_data.get('gender'),
-                skin_type=profile_data.get('skinType'),
-                sensitive_skin=True if profile_data.get('sensitiveSkin') == "Yes" else False,
-                skin_concerns=profile_data.get('skinConcerns'),
-                ingredients_to_avoid=profile_data.get('ingredientsToAvoid'),
-                known_allergies=profile_data.get('knownAllergies'),
-                min_price=profile_data.get('minPrice'),
-                max_price=profile_data.get('maxPrice'),
-                preferences=profile_data.get('preferences')
-            )
-            user_profile_id = add_user_profile(user_profile)
+#             user_profile = UserProfile(
+#                 user_id=user.id,
+#                 age=profile_data.get('age'),
+#                 gender=profile_data.get('gender'),
+#                 skin_type=profile_data.get('skinType'),
+#                 sensitive_skin=True if profile_data.get('sensitiveSkin') == "Yes" else False,
+#                 skin_concerns=profile_data.get('skinConcerns'),
+#                 ingredients_to_avoid=profile_data.get('ingredientsToAvoid'),
+#                 known_allergies=profile_data.get('knownAllergies'),
+#                 min_price=profile_data.get('minPrice'),
+#                 max_price=profile_data.get('maxPrice'),
+#                 preferences=profile_data.get('preferences')
+#             )
+#             user_profile_id = add_user_profile(user_profile)
 
-            response = make_response(jsonify({
-                "message": f"new user profile with id {str(user_profile_id)} created",
-            }))
-            response.status_code = 201
-        else:
-            response = make_response(jsonify({
-                "message" : "invalid request parameter"
-            }))
-            response.status_code = 400
-    except UserNotFoundError as ex:
-        response = make_response(jsonify({
-                "message" : str(ex)
-        }))
-        response.status_code = 404
-    except Exception as ex:
-        print(ex)
-        response = make_response(jsonify({
-            "message": "something went wrong"
-        }))
-        response.status_code = 500
-    response.headers['content-type'] = 'application/json'
-    return response
+#             response = make_response(jsonify({
+#                 "message": f"new user profile with id {str(user_profile_id)} created",
+#             }))
+#             response.status_code = 201
+#         else:
+#             response = make_response(jsonify({
+#                 "message" : "invalid request parameter"
+#             }))
+#             response.status_code = 400
+#     except UserNotFoundError as ex:
+#         response = make_response(jsonify({
+#                 "message" : str(ex)
+#         }))
+#         response.status_code = 404
+#     except Exception as ex:
+#         print(ex)
+#         response = make_response(jsonify({
+#             "message": "something went wrong"
+#         }))
+#         response.status_code = 500
+#     response.headers['content-type'] = 'application/json'
+#     return response
 
 @api_bp.route("/profile/<user_id>", methods=['GET'])
 def get_user_profile(user_id: str):
@@ -278,6 +278,11 @@ def get_user_profile(user_id: str):
             "message" : str(ex)
         }))
         response.status_code = 404
+    except UserProfileNotFoundError as ex:
+        response = make_response(jsonify({
+            "message" : f"User profile for user {user_id} not found"
+        }))
+        response.status_code = 404  # Profile not found should return 404
     except Exception as ex:
         print(ex)
         response = make_response(jsonify({
@@ -482,5 +487,85 @@ def create_product_embeddings():
         "message" : "vectors in products collection created successfully"
     }))
     response.status_code = 201
+    response.headers['content-type'] = 'application/json'
+    return response
+
+@api_bp.route("/profile/<user_id>", methods=['POST'])
+def add_or_update_profile(user_id: str):
+    try:
+        if not user_id:
+            response = make_response(jsonify({
+                "message": "invalid request parameter"
+            }))
+            response.status_code = 400
+            return response
+
+        data = request.get_json()
+        if not data or 'profileData' not in data:
+            response = make_response(jsonify({
+                "error": "Invalid payload."
+            }))
+            response.status_code = 400
+            return response
+
+        profile_data = data.get('profileData')
+        user = get_user_by_id(user_id)
+
+        # Check if profile already exists
+        existing_profile = get_user_profile_by_user_id(user_id)
+
+        if existing_profile:
+            # Update existing profile
+            existing_profile.age = profile_data.get('age')
+            existing_profile.gender = profile_data.get('gender')
+            existing_profile.skin_type = profile_data.get('skinType')
+            existing_profile.sensitive_skin = True if profile_data.get('sensitiveSkin') == "Yes" else False
+            existing_profile.skin_concerns = profile_data.get('skinConcerns')
+            existing_profile.ingredients_to_avoid = profile_data.get('ingredientsToAvoid')
+            existing_profile.known_allergies = profile_data.get('knownAllergies')
+            existing_profile.min_price = profile_data.get('minPrice')
+            existing_profile.max_price = profile_data.get('maxPrice')
+            existing_profile.preferences = profile_data.get('preferences')
+
+            update_user_profile(existing_profile)
+
+            response = make_response(jsonify({
+                "message": f"user profile with id {str(existing_profile.id)} updated",
+            }))
+            response.status_code = 200
+        else:
+            # Create new profile
+            user_profile = UserProfile(
+                user_id=user.id,
+                age=profile_data.get('age'),
+                gender=profile_data.get('gender'),
+                skin_type=profile_data.get('skinType'),
+                sensitive_skin=True if profile_data.get('sensitiveSkin') == "Yes" else False,
+                skin_concerns=profile_data.get('skinConcerns'),
+                ingredients_to_avoid=profile_data.get('ingredientsToAvoid'),
+                known_allergies=profile_data.get('knownAllergies'),
+                min_price=profile_data.get('minPrice'),
+                max_price=profile_data.get('maxPrice'),
+                preferences=profile_data.get('preferences')
+            )
+            user_profile_id = add_user_profile(user_profile)
+
+            response = make_response(jsonify({
+                "message": f"new user profile with id {str(user_profile_id)} created",
+            }))
+            response.status_code = 201
+
+    except UserNotFoundError as ex:
+        response = make_response(jsonify({
+            "message": str(ex)
+        }))
+        response.status_code = 404
+    except Exception as ex:
+        print(ex)
+        response = make_response(jsonify({
+            "message": "something went wrong"
+        }))
+        response.status_code = 500
+
     response.headers['content-type'] = 'application/json'
     return response
