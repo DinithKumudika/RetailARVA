@@ -392,7 +392,7 @@ def add_chat_message(message: Message) -> ObjectId:
         if not result.acknowledged:
             print("Message insertion was not acknowledged by the database.")
             raise MessageInsertionError()
-        result.inserted_id
+        return result.inserted_id
     except AttributeError as e:
         # Handle cases where message.to_dict() fails
         print(f"Invalid message object: {e}")
