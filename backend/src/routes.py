@@ -4,14 +4,13 @@ from bson import ObjectId
 from flask import jsonify, request, make_response, redirect, Blueprint, current_app as app
 from flask_pymongo import PyMongo
 from src.exceptions.exceptions import UserNotFoundError, ChatHistoryNotFoundError, ProductNotFoundError,UserProfileNotFoundError
-from src.helpers.formatting import format_list
-from src.helpers.db import get_product_by_id, get_all_products, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile, get_user_profile_by_id, get_user_profile_by_user_id, update_user_profile
+from src.helpers.db import get_product_by_id, add_products, get_user_by_id, create_chat, add_chat_message, update_message_count, get_chat_history_by_chat_id, add_user, get_user_by_email, add_user_profile, get_user_profile_by_id, get_user_profile_by_user_id, update_user_profile
 from src.utils.vector_db import VectorDb
 from langchain.docstore.document import Document
 from src.models.models import User, Chat, Message, UserProfile
 from src.utils.chatbot import Chatbot
 from src.helpers.import_json_to_mongo import load_from_json
-from src import templates
+import json
 
 api_bp = Blueprint("api", __name__)
 
@@ -334,7 +333,11 @@ def create_new_chat(user_id: str):
         if user_id:
             user = get_user_by_id(user_id)
             chat_id = create_chat(Chat(user_id=user_id))
-            response = chat.greet()
+
+            chat.session_id = str(chat_id)
+            chat.set_chat_session()
+
+            response = chat.greet(user.first_name)
             message_id = add_chat_message(
                 Message(
                     chat_id=chat_id, 
@@ -343,7 +346,10 @@ def create_new_chat(user_id: str):
                     message_id=1
                 )
             )
-            is_updated = update_message_count(chat_id=chat_id, count=1)
+
+            print(chat_id)
+
+            is_updated = update_message_count(chat_id=str(chat_id), count=1)
 
             if is_updated:
                 response = make_response(jsonify({
@@ -367,9 +373,9 @@ def create_new_chat(user_id: str):
                 "message" : str(ex)
         }))
         response.status_code = 404
-    except Exception:
+    except Exception as ex:
         response = make_response(jsonify({
-                "message" : "something went wrong"
+                "message" : f"something went wrong, {str(ex)}"
         }))
         response.status_code = 500
     response.headers['content-type'] = 'application/json'
@@ -388,11 +394,13 @@ def chat_with_assistant(chat_id: str):
             role = request_data.get('role')
             
             print(f"user query: {query}")
-            
+
             chat_history = get_chat_history_by_chat_id(chat_id=chat_id)
-            
-            formatted_history:list = chat.format_to_message_history(chat_history=chat_history)
-            response = chat.invoke(query=query, chat_history=formatted_history)
+
+            chat.session_id = chat_id
+            chat.set_chat_session()
+
+            response = chat.invoke(query=query)
             
             print(f"chat response: {response}")
             
@@ -409,18 +417,22 @@ def chat_with_assistant(chat_id: str):
                 chat_id=ObjectId(chat_id), 
                 message_id=len(chat_history) + 2
             ))
-            
-            response = make_response(jsonify({
-                "data": Message(
-                        _id=message_id, 
-                        chat_id=ObjectId(chat_id), 
-                        role="assistant", 
-                        content=response, 
-                        message_id=len(chat_history) + 2
-                    ).to_dict(),
-                "message" : f"message with id {message_id} added to the chat {chat_id}"
-            }))
-            response.status_code = 201
+
+            chat_history = get_chat_history_by_chat_id(chat_id=chat_id)
+            is_updated = update_message_count(chat_id=str(chat_id), count=len(chat_history))
+
+            if is_updated:
+                response = make_response(jsonify({
+                    "data": Message(
+                            _id=message_id,
+                            chat_id=ObjectId(chat_id),
+                            role="assistant",
+                            content=response,
+                            message_id=len(chat_history) + 2
+                        ).to_dict(),
+                    "message" : f"message with id {message_id} added to the chat {chat_id}"
+                }))
+                response.status_code = 201
     except ChatHistoryNotFoundError as ex:
         response = make_response(jsonify({
                 "message" : str(ex)
@@ -429,7 +441,7 @@ def chat_with_assistant(chat_id: str):
     except Exception as ex:
         print(str(ex))
         response = make_response(jsonify({
-                "message" : "something went wrong"
+                "message" : f"something went wrong, {str(ex)}"
         }))
         response.status_code = 500
     response.headers['content-type'] = 'application/json'
@@ -440,39 +452,23 @@ def create_product_embeddings():
     product_profiles : list[str] = []
     docs : List[Document] = []
     qdrant : VectorDb = app.config['QDRANT']()
+
+    # read data from product_descriptions.json to a list
+    with open("./src/data/product_descriptions.json", "r") as f:
+        product_descriptions = json.load(f)
+        print(product_descriptions)
     
-    for product in get_all_products():
-
-        product_profile = templates.product_profile.format(
-            id=product.id,
-            name=product.name,
-            brand=product.brand,
-            category=product.category,
-            price=product.price,
-            is_natural="Yes" if product.is_natural else "No",
-            concentrations=product.concentrations,
-            ingredients_list=format_list(product.ingredients),
-            key_ingredients_list=format_list(product.key_ingredients),
-            benefits_list=product.benefits,
-            side_effects_list=format_list(product.side_effects),
-            usage=product.usage,
-            application_tips=product.application_tips,
-            skin_types=product.skin_types,
-            skin_concerns_list=format_list(product.skin_concerns),
-            allergens_list=format_list(product.allergens),
-            sensitivities_list=format_list(product.sensitivities)            
-        )
-
-        product_profiles.append(product_profile)
+    for product in product_descriptions:
 
         docs.append(
             Document(
-                page_content=product_profile,
+                page_content=product["content"],
                 metadata={
-                    "id": product.id,
-                    "product name": product.name,
-                    "product brand": product.brand,
-                    "product category": product.category
+                    "id": product["id"],
+                    "product name": product["metadata"]["name"],
+                    "product brand": product["metadata"]["brand"],
+                    "product category": product["metadata"]["category"],
+                    "price": product["metadata"]["price"]
                 }
             )
         )

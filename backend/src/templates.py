@@ -1,51 +1,61 @@
 product_profile = """
-Product Profile : {id}
----------------
+    # {{ name }}
+    ---
+    ## Product Overview
+    - Name: {{ name }}
+    - Brand: {{ brand }}
+    - Category: {{ category }}
+    - Price: {{ price }} (in LKR)
+    - Natural: {{ is_natural }} 
 
-Basic Information
------------------
-Name: {name}
-Brand: {brand}
-Category: {category}
-Price: LKR{price:.2f}
-Is Natural: {is_natural}
-Ingredient concentrations level: {concentrations}
+    ## Ingredients
+    - Key Ingredients: {{ key_ingredients }}
+    - Concentrations: {{ concentrations }}
+    - Full Ingredient List: {{ ingredients }}
+/
+    ## Benefits and Claims
+    - Benefits: {{ benefits }}
+    - Claims: {{ claims }}
 
-Composition
------------
-Ingredients:
-{ingredients_list}
+    ## Usage and Application
+    - Usage: {{ usage }}
+    - Application Tips: {{ application_tips }}
 
-Key Ingredients:
-{key_ingredients_list}
+    ## Skin Suitability
+    - Suitable for Skin Types: {{ skin_types }}
+    - Addresses Skin Concerns: {{ skin_concerns }}
+    - For Sensitive Skin: {{ for_sensitive_skin }}
 
-Benefits and Usage
-------------------
-Benefits:
-{benefits_list}
+    ## Safety Information
+    - Potential Side Effects: {{ side_effects }}
+    - Allergens: {{ allergens }}
 
-Side Effects:
-{side_effects_list}
+    ## Reviews and Ratings
+    - Average Rating: {{ average_rating }}/5
+    - Customer Reviews:
+        {% for review in customer_reviews %}
+        - {{ review.review }} - {{ review.rating }} stars
+        {% endfor %}
+    - Expert Review: {{ expert_review }}
+"""
 
-Usage Instructions:
-{usage}
+user_profile = """
+    # User Profile
+    ---
+    ## Personal Information
+    - Age: {{age }}
+    - Gender: {{ gender }}
 
-Application Tips:
-{application_tips}
+    ## Skin Profile
+    - Skin Type: {{ skin_type }}
+    - Sensitive Skin: {{ sensitive }}
+    - Skin Concerns: {{ skin_concerns }}
 
-Skin Compatibility
-------------------
-Suitable for Skin Types:
-{skin_types}
+    ## Product Preferences
+    - Preferred Price Range: LKR {{ min_price }} - {{ max_price }}
+    - Preferences: {{ preferences }}
 
-Addresses Skin Concerns:
-{skin_concerns_list}
-
-Special Considerations
-----------------------
-Allergens:
-{allergens_list}
-
-Sensitivities:
-{sensitivities_list}
+    ## Safety Information
+    - Ingredients to Avoid: {{ ingredients_to_avoid }}
+    - Known Allergies: {{ known_allergies }}
 """

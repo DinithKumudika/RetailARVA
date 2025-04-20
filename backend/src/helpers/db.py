@@ -2,14 +2,10 @@ from src.models.models import Product, User, Chat, Message, UserProfile
 from flask import current_app as app
 from src.exceptions.exceptions import NoProductsFoundError, ProductNotFoundError, UserInsertionError, ProfileDataInsertionError, ProductInsertionError, UserNotFoundError, UserProfileNotFoundError, ChatNotFoundError, ChatCreationError, ChatUpdateError, ChatHistoryNotFoundError, MessageInsertionError
 from bson.objectid import ObjectId
-from typing import List, Union, Optional
+from typing import List, Optional
 from pymongo.errors import PyMongoError, BulkWriteError
 
-
-mongo = app.config.get('MONGO')
-db = mongo.db
-
-def add_produt(product: Product) -> ObjectId:
+def add_product(product: Product) -> ObjectId:
     """
     Adds a product to the database.
 
@@ -24,6 +20,7 @@ def add_produt(product: Product) -> ObjectId:
         ValueError: If the product is invalid or cannot be converted to a dictionary.
         PyMongoError: If there is an issue with the database operation.
     """
+    db = app.config['MONGO'].db
     try:
         inserted_product = db.products.insert_one(product.to_dict())
         if not inserted_product.acknowledged:
@@ -56,6 +53,7 @@ def add_products(products: list[Product]) -> ObjectId:
         BulkWriteError: If there is an issue during bulk insertion.
         PyMongoError: If there is a general database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         product_dicts = [product.to_dict() for product in products]
         result = db.products.insert_many(product_dicts)
@@ -89,11 +87,12 @@ def get_product_by_id(product_id: int) -> Product:
         ProductNotFoundError: If no product is found with the given ID.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
-        product: Optional[dict] = db.products.find_one({"product_id": product_id})
+        product = db.products.find_one({"product_id": product_id})
         if product is None:
             print(f"No product found with id: {product_id}")
-            raise ProductNotFoundError(id)
+            raise ProductNotFoundError(product_id)
         return Product.from_dict(product)
     except PyMongoError as pe:
         # Handle general database-related errors
@@ -110,6 +109,7 @@ def get_all_products()-> List[Product]:
     Raises:
         NoProductsFoundError: If no products exist in the database.
     """
+    db = app.config['MONGO'].db
     products_cursor = db.products.find()
     products : List[Product] = [Product.from_dict(product) for product in products_cursor]
     if not products:
@@ -132,6 +132,7 @@ def add_user(user: User) -> ObjectId:
         UserInsertionError: If the insertion is not acknowledged by the database.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         result = db.users.insert_one(user.to_dict())
         if not result.acknowledged:
@@ -162,6 +163,7 @@ def add_user_profile(profile_data: UserProfile):
         ProfileDataInsertionError: If the insertion is not acknowledged by the database.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         result = db.user_profiles.insert_one(profile_data.to_dict())
         if not result.acknowledged:
@@ -191,6 +193,7 @@ def get_user_profile_by_id(user_id: str) -> UserProfile:
             UserNotFoundError: If no user is found with the given ID.
             PyMongoError: If there is a database-related error.
         """
+    db = app.config['MONGO'].db
     try:
         user_profile: Optional[dict] = db.user_profiles.find_one({"user_id": ObjectId(user_id)})
         if user_profile is None:
@@ -216,6 +219,7 @@ def get_user_by_id(user_id: str) -> User:
         UserNotFoundError: If no user is found with the given ID.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         user: Optional[dict] = db.users.find_one({"_id": ObjectId(user_id)})
         if user is None:
@@ -241,7 +245,7 @@ def get_user_by_email(email: str) -> User:
         UserNotFoundError: If no user is found with the given ID.
         PyMongoError: If there is a database-related error.
     """
-    
+    db = app.config['MONGO'].db
     try:
         user: Optional[dict] = db.users.find_one({"email": email})
         if user is None:
@@ -268,6 +272,7 @@ def get_chat_by_id(id: str) -> Chat:
         InvalidId: If the provided ID is not a valid ObjectId.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         chat: Optional[dict] = db.chats.find_one({"_id": ObjectId(id)})
         if chat is None:
@@ -294,6 +299,7 @@ def create_chat(chat: Chat) -> ObjectId:
         ChatCreationError: If the insertion is not acknowledged by the database.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         result = db.chats.insert_one(chat.to_dict())
         if not result.acknowledged:
@@ -325,6 +331,7 @@ def update_message_count(chat_id: str, count: int) -> bool:
         ChatUpdateError: If the update operation fails.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         result = db.chats.update_one(
             {"_id": ObjectId(chat_id)},
@@ -361,6 +368,7 @@ def get_chat_history_by_chat_id(chat_id: str) -> list[Message]:
         ChatHistoryNotFoundError: If no messages are found for the given chat ID.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         chat_mesages_cursor = db.messages.find({"chat_id": ObjectId(chat_id)})
         chat_messages = [Message.from_dict(message) for message in chat_mesages_cursor]
@@ -387,6 +395,7 @@ def add_chat_message(message: Message) -> ObjectId:
         MessageInsertionError: If the insertion is not acknowledged by the database.
         PyMongoError: If there is a database-related error.
     """
+    db = app.config['MONGO'].db
     try:
         result = db.messages.insert_one(message.to_dict())
         if not result.acknowledged:
@@ -404,6 +413,7 @@ def add_chat_message(message: Message) -> ObjectId:
         raise pe
     
 def get_user_profile_by_user_id(user_id: str) -> Optional[UserProfile]:
+    db = app.config['MONGO'].db
     try:
         profile_data = db.user_profiles.find_one({"user_id": ObjectId(user_id)})
 
@@ -418,6 +428,7 @@ def get_user_profile_by_user_id(user_id: str) -> Optional[UserProfile]:
         raise
 
 def update_user_profile(user_profile: UserProfile) -> None:
+    db = app.config['MONGO'].db
     try:
         if not user_profile.id:
             raise ValueError("UserProfile must have an id to be updated.")

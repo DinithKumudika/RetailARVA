@@ -61,6 +61,7 @@ services:
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL_ID=llama3.1:latest
       - OLLAMA_EMBEDDING_MODEL_ID=nomic-embed-text:latest
+      - CLASSIFICATION_MODEL_ID=deepseek-r1:7b
       - GEMINI_MODEL_ID=gemini-1.5-flash
       - GEMINI_EMBEDDING_MODEL_ID=llama3.1:latest
       - GOOGLE_GENERATIVE_LANGUAGE_API_KEY=AIzaSyDpcYeeReEC_IdaiNRtMJLfqTJpX74ZtLI
@@ -81,7 +82,7 @@ services:
       - LANGSMITH_TRACING='true'
       - LANGSMITH_ENDPOINT='https://api.smith.langchain.com'
       - LANGSMITH_API_KEY='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'
-      - LANGSMITH_PROJECT='retailARVA-""deployment'
+      - LANGSMITH_PROJECT='retailARVA-deployment'
     volumes:
       - retailarva-data:/app/src/data
     container_name: RetailARVA.Api

@@ -1,11 +1,8 @@
-from flask import Config, Flask, g, current_app
+from flask import Flask, g, current_app
 from src.configs.config import DevConfig, QdrantConfig, GradioConfig, GoogleConfig, LangsmithConfig, MongoConfig, OllamaConfig, GroqConfig, HuggingFaceConfig
-from src.utils.rag_pipeline import RagPipeline
-from src.utils.chatbot import Chatbot, OutputParserTypes
+from src.utils.chatbot import Chatbot
 from flask_pymongo import PyMongo
 from src.utils.vector_db import VectorDb
-import os
-
 
 def get_db():
     config = current_app.config
@@ -37,27 +34,8 @@ def get_qdrant() -> VectorDb:
 def get_chat():
     if 'chat' not in g:
         chat = Chatbot()
-        chat.set_parser(OutputParserTypes.STRING)
-        qdrant = get_qdrant()
-        chat.set_vector_store(qdrant.get_collection("products"))
         g.chat = chat
     return g.chat
-    
-def get_rag_pipeline():
-    if '_rag_pipeline' not in g:
-        chat = get_chat()
-        qdrant = get_qdrant()
-        rag_pipeline = RagPipeline(
-            chat.vector_store,
-            search_k=3,
-            model=chat.model,
-            embedding_model=qdrant.embeddings
-        )
-        rag_pipeline.set_history_aware_retriever()
-        rag_pipeline.set_qa_chain()
-        rag_pipeline.set_rag_chain()
-        g.rag_pipeline = rag_pipeline
-    return g.rag_pipeline
 
 def create_app():
     app = Flask(__name__)
@@ -93,7 +71,6 @@ def create_app():
         
         app.config['QDRANT'] = get_qdrant
         app.config['CHAT'] = get_chat
-        app.config['RAG_PIPELINE'] = get_rag_pipeline
         
         @app.teardown_appcontext
         def teardown_db(exception):
