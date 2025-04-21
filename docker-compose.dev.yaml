@@ -35,7 +35,8 @@ services:
       - OLLAMA_URL=http://172.21.174.131:11434
       - OLLAMA_MODEL_ID=llama3.1:latest
       - OLLAMA_EMBEDDING_MODEL_ID=nomic-embed-text:latest
-      - CLASSIFICATION_MODEL_ID=deepseek-r1:7b
+      - CLASSIFICATION_MODEL_ID=deepseek-r1:1.5b
+      - RECOMMENDATION_MODEL_ID=llama3.1:latest
       - GEMINI_MODEL_ID=gemini-1.5-flash
       - GEMINI_EMBEDDING_MODEL_ID=llama3.1:latest
       - GOOGLE_GENERATIVE_LANGUAGE_API_KEY=AIzaSyDpcYeeReEC_IdaiNRtMJLfqTJpX74ZtLI

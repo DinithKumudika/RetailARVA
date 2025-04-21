@@ -6,9 +6,7 @@ ollama serve &
 # Wait for Ollama server to start
 sleep 5
 
-# Pull llama 3 and nomic-embed
-ollama pull bge-large
-ollama pull nomic-embed-text:latest
+ollama llama3.3:70b-instruct-q4_K_M
 
 # Wait for the Ollama server to finish 
 wait $!

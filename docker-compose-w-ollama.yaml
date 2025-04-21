@@ -62,6 +62,7 @@ services:
       - OLLAMA_MODEL_ID=llama3.1:latest
       - OLLAMA_EMBEDDING_MODEL_ID=nomic-embed-text:latest
       - CLASSIFICATION_MODEL_ID=deepseek-r1:7b
+      - RECOMMENDATION_MODEL_ID=deepseek-r1:7b
       - GEMINI_MODEL_ID=gemini-1.5-flash
       - GEMINI_EMBEDDING_MODEL_ID=llama3.1:latest
       - GOOGLE_GENERATIVE_LANGUAGE_API_KEY=AIzaSyDpcYeeReEC_IdaiNRtMJLfqTJpX74ZtLI
