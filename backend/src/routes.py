@@ -390,6 +390,7 @@ def chat_with_assistant(chat_id: str):
             
             request_data = request.get_json()
             user_id = request_data.get('user_id')
+            product_id = request_data.get('product_id')
             query = request_data.get('message')
             role = request_data.get('role')
             
@@ -400,7 +401,7 @@ def chat_with_assistant(chat_id: str):
             chat.session_id = chat_id
             chat.set_chat_session()
 
-            response = chat.invoke(query=query)
+            response = chat.invoke(query=query, user_id = user_id, product_id=product_id)
             
             print(f"chat response: {response}")
             

@@ -89,7 +89,7 @@ class Chatbot:
         self.add_ai_message(response)
         return response
     
-    def invoke(self, query: str) -> str:
+    def invoke(self, query: str, user_id: str, product_id: int) -> str:
         try:
             product_info_chain = get_product_info_chain(self.llm)
             product_info_chain_with_history = RunnableWithMessageHistory(
@@ -147,10 +147,10 @@ class Chatbot:
                 | routed_chain
             )
 
-            user_info = RagHelper.get_formatted_user_profile("6803cee63daaa9c47cb0a1c0")
+            user_info = RagHelper.get_formatted_user_profile(user_id)
             print(f"user info:\n {user_info}")
 
-            product_info = RagHelper.get_formatted_product(3)
+            product_info = RagHelper.get_formatted_product(product_id)
             print(f"product info:\n {product_info}")
 
             response = full_chain.invoke(

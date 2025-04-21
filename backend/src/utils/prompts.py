@@ -77,7 +77,7 @@ query_expansion_prompt: str = """You are an AI language model assistant. Your ta
 
 classification_prompt: str = """"
     ## Instructions:
-    - You are a helpful assistant for a skincare support system. Your task is to classify the given user query into one of the following three categories based on the user's intent:
+    - You are a helpful assistant for a skincare support system. Your task is to classify the given user query into one of the following four categories based on the user's intent:
     
     Category 1: product_info
     Description – The user is asking about a specific skincare product, its ingredients, usage, benefits, or related information.
@@ -91,7 +91,10 @@ classification_prompt: str = """"
     Description: The user is asking for product suggestions or alternatives based on their skin profile or preferences.
     (Use this when the user wants suggestions or alternatives.)
     
-    Only return the name of the most suitable category (ex-: "product_info"). If you are unable to classify the query into any of the above categories, return "general".
+    Category 4: general
+    Description: The user is asking a general question that does not fit into the above categories. This may include inquiries about skincare routines, tips, or other non-specific questions.
+    
+    **Only return the name of the most suitable category from the above (ex-: "product_info")**
 """
 
 product_info_prompt: str = """"
