@@ -19,12 +19,12 @@ from jinja2 import Template
 class RagHelper:
     @staticmethod
     def get_classification_model():
-        return ChatOllama(
-            base_url=app.config.get('OLLAMA_URL'),
+        return ChatGoogleGenerativeAI(
             model=app.config.get('CLASSIFICATION_MODEL_ID'),
-            temperature=0.0
+            google_api_key=app.config.get('GOOGLE_GENERATIVE_LANGUAGE_API_KEY'),
+            temperature=0.0,
+            convert_system_message_to_human=True
         )
-
     @staticmethod
     def get_recommendation_model():
         return ChatOllama(
