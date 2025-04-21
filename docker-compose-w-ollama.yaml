@@ -61,7 +61,7 @@ services:
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL_ID=llama3.1:latest
       - OLLAMA_EMBEDDING_MODEL_ID=nomic-embed-text:latest
-      - CLASSIFICATION_MODEL_ID=deepseek-r1:1.5b
+      - CLASSIFICATION_MODEL_ID=llama3.1:latest
       - RECOMMENDATION_MODEL_ID=llama3.1:latest
       - GEMINI_MODEL_ID=gemini-1.5-flash
       - GEMINI_EMBEDDING_MODEL_ID=llama3.1:latest

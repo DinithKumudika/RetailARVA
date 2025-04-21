@@ -94,7 +94,25 @@ classification_prompt: str = """"
     Category 4: general
     Description: The user is asking a general question that does not fit into the above categories. This may include inquiries about skincare routines, tips, or other non-specific questions.
     
-    **Only return the name of the most suitable category from the above (ex-: "product_info")**
+    ## To classify the query accurately, follow these steps:
+    
+    1. Check if the query is asking for product suggestions, recommendations, or alternatives.
+    - Look for phrases such as "recommend," "suggest," "what products," "which brand," "alternatives," "similar to," etc.
+    - If yes, classify as recommendation.
+    - If no, proceed to step 2.
+    
+    2. Check if the query mentions a specific skincare product.
+    - Look for product names, brands, or references like "this product," "the serum," etc.
+    - If yes, proceed to step 3.
+    - If no, classify as general.
+    
+    3. For queries mentioning a specific product:
+    - Check if the query is asking whether the product is suitable for certain skin types, skin concerns, allergies, or personal attributes (e.g., "for me," "my skin").
+    - If yes, classify as suitability_check.
+    - If no, classify as product_info.
+    
+    ## Output:
+    - Only return the name of the most suitable category from the above (ex-: "product_info")
 """
 
 product_info_prompt: str = """"
