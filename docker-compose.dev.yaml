@@ -56,8 +56,8 @@ services:
 
       - LANGSMITH_TRACING=true
       - LANGSMITH_ENDPOINT=https://api.smith.langchain.com
-      - LANGSMITH_API_KEY=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
-      - LANGSMITH_PROJECT=retailarva-chatbot
+      - LANGSMITH_API_KEY=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
+      - LANGSMITH_PROJECT=retailarva-deployment
     volumes:
       - retailarva-data:/app/src/data
     container_name: RetailARVA.Api

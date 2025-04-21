@@ -80,10 +80,10 @@ services:
       - NGROK_STATIC_DOMAIN=alert-evolved-chicken.ngrok-free.app
       - NGROK_API_KEY=2pLIqaJvCW1wiY5H1ZO6TUES8nt_73Jvh7frCqNjS6vVVVBKh
 
-      - LANGSMITH_TRACING='true'
-      - LANGSMITH_ENDPOINT='https://api.smith.langchain.com'
-      - LANGSMITH_API_KEY='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'
-      - LANGSMITH_PROJECT='retailARVA-deployment'
+      - LANGSMITH_TRACING=true
+      - LANGSMITH_ENDPOINT=https://api.smith.langchain.com
+      - LANGSMITH_API_KEY=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
+      - LANGSMITH_PROJECT=retailarva-deployment
     volumes:
       - retailarva-data:/app/src/data
     container_name: RetailARVA.Api
