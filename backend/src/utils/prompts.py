@@ -123,6 +123,7 @@ product_info_prompt: str = """"
     - Consider the given information about the skincare product and the user's query.
     - Based on that information, answer the user's query.
     - don't mention to user that you are getting information from a context or product profile.
+    - Your response should be natural as possible without any special characters or formatting.
     
     <Product Information>
     {product_info}
@@ -137,6 +138,7 @@ product_suitability_prompt: str = """
     - If you don't have sufficient information for the task then ask for more information or clarifications.
     - Keep the response short and concise without overwhelming user with unnecessary information.
     - Don't mention to user that you are getting information from a context, product profile or a user profile.
+    - Your response should be natural as possible without any special characters or formatting.
         
     <Product Information>
     {product_info}
@@ -152,6 +154,8 @@ recommendation_prompt: str = """"
     - Your goal is to recommend skincare products that best suit the user's individual needs and current query, while strictly avoiding any ingredients or products that could cause harm, irritation, or discomfort.
     - Consider the given information about the skincare product, the user's skin profile and preferences, and the set of similar skincare products.
     - Based on that information, try to provide the product recommendations.
+    - Keep the response short and concise without overwhelming user with unnecessary information.
+    - Your response should be natural as possible without any special characters or formatting.
     
     [PRODUCT SELECTION LOGIC]
     *Step 1: Understand the Query*
