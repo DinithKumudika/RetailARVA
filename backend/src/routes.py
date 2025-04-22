@@ -384,6 +384,7 @@ def create_new_chat(user_id: str):
 
 @api_bp.route("/chat/<chat_id>", methods=['POST'])
 def chat_with_assistant(chat_id: str):
+    chat_id = chat_id.strip()  # Fix: remove extra spaces
     try:
         if chat_id:
             chat: Chatbot = app.config['CHAT']()
