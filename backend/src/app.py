@@ -1,116 +1,100 @@
-from dotenv import dotenv_values
-from flask import Flask, g
-from configs.database import Database
-from configs.config import DevConfig, QdrantConfig, GradioConfig, GoogleConfig, LangsmithConfig
-from utils.rag_pipeline import RagPipeline
-from utils.chatbot import Chatbot, OutputParserTypes
-from utils.database import create_all, is_database_created
-from utils.vector_db import VectorDb
-import ngrok
-import os
+from flask import Flask, g, current_app
+from src.configs.config import DevConfig, QdrantConfig, GradioConfig, GoogleConfig, LangsmithConfig, MongoConfig, OllamaConfig, GroqConfig, HuggingFaceConfig
+from src.utils.chatbot import Chatbot
+from flask_pymongo import PyMongo
+from src.utils.vector_db import VectorDb
+
+def get_db():
+    config = current_app.config
+    if 'db' not in g:
+        try:
+            mongo_uri = f"mongodb://{config.get('MONGO_HOST')}:{config.get('MONGO_PORT')}/{config.get('MONGO_DBNAME')}"
+            db = PyMongo(current_app, uri=mongo_uri).db
+            g.db = db
+        except Exception as e:
+            current_app.logger.error(f"Error connecting to database: {e}")
+            raise
+    return g.db
+
+def get_qdrant() -> VectorDb:
+    config = current_app.config
+    if 'qdrant' not in g:
+        try:
+            qdrant = VectorDb(
+                url=config.get('QDRANT_URL'),
+                api_key=config.get('QDRANT_API_KEY')
+            )
+            qdrant.set_embedding_model()
+            g.qdrant = qdrant
+        except Exception as e:
+            current_app.logger.error(f"Failed to initialize Qdrant: {e}")
+            raise      
+    return g.qdrant
+    
+def get_chat():
+    if 'chat' not in g:
+        chat = Chatbot()
+        g.chat = chat
+    return g.chat
 
 def create_app():
     app = Flask(__name__)
-    
+        
     # set app configurations
-    env = dotenv_values("../.env")
+    # env = dotenv_values(".env")
     app.config.from_object(DevConfig)
     app.config.from_object(GoogleConfig)
     app.config.from_object(QdrantConfig)
     app.config.from_object(GradioConfig)
     app.config.from_object(LangsmithConfig)
-    
-    os.environ["LANGCHAIN_TRACING_V2"] = app.config.get('LANGCHAIN_TRACING_V2')
-    os.environ["LANGCHAIN_API_KEY"] = app.config.get('LANGCHAIN_API_KEY')
-    os.environ["LANGCHAIN_ENDPOINT"] = app.config.get('LANGCHAIN_ENDPOINT')
-    os.environ["LANGCHAIN_PROJECT"] = app.config.get('LANGCHAIN_PROJECT')
-
-    db = Database(app.config.get('DATABASE_URL'))
-    
-    try:
-        db.connect()
-    except Exception as e:
-        app.logger.error(f"Database connection failed: {e}")
-
-    def get_db() -> Database:
-        if 'db' not in g:
-            g.db = db
-        return g.db
-
-    if is_database_created(db) == False:
-        create_all(db)
-
-    try:
-        qdrant = VectorDb(
-            env.get('QDRANT_CLUSTER_URL'), 
-            env.get('QDRANT_API_KEY')
-        )
-        qdrant.set_embedding_model()
-    except Exception as e:
-        app.logger.error(f"Failed to initialize Qdrant: {e}")
-        raise
-
-    def get_qdrant() -> VectorDb:
-        if 'qdrant' not in g:
-            g.qdrant = qdrant
-        return g.qdrant
-    
-    def get_chat():
-        if 'chat' not in g:
-            db = app.config['DB']()
-            chat = Chatbot(db)
-            chat.set_parser(OutputParserTypes.STRING)
-            qdrant = app.config['QDRANT']()
-            chat.set_vector_store(qdrant.get_collection("products"))
-            g.chat = chat
-        return g.chat
-    
-    def get_rag_pipeline():
-        if 'rag_pipeline' not in g:
-            chat = app.config['CHAT']()
-            rag_pipeline = RagPipeline(
-                chat.vector_store,
-                search_k=3,
-                model=chat.model
-            )
-            rag_pipeline.set_history_aware_retriever()
-            rag_pipeline.set_qa_chain()
-            rag_pipeline.set_rag_chain()
-            g.rag_pipeline = rag_pipeline
-        return g.rag_pipeline
-
-    @app.teardown_appcontext
-    def teardown_db(exception):
-        db = g.pop('db', None)
-        if db is not None:
-            pass
-
-    @app.teardown_appcontext
-    def teardown_qdrant(exception):
-        qdrant = g.pop('qdrant', None)
-        if qdrant is not None:
-            # Perform any necessary teardown for qdrant if needed
-            pass
-    
-    @app.teardown_appcontext
-    def teardown_gemini_chat(exception):
-        chat = g.pop('chat', None)
-        if chat is not None:
-            # Perform any necessary teardown for qdrant if needed
-            pass
-    
-    from routes import api_bp
-    
-    app.config['DB'] = get_db
-    app.config['QDRANT'] = get_qdrant
-    app.config['CHAT'] = get_chat
-    app.config['RAG_PIPELINE'] = get_rag_pipeline
+    app.config.from_object(MongoConfig)
+    app.config.from_object(OllamaConfig)
+    app.config.from_object(GroqConfig)
+    app.config.from_object(HuggingFaceConfig)
 
     with app.app_context():
-        app.register_blueprint(api_bp, url_prefix="/api")
-    
-    return app
+        try:
+            mongo_uri = f"mongodb://{app.config.get('MONGO_HOST')}:{app.config.get('MONGO_PORT')}/{app.config.get('MONGO_DBNAME')}"
+            print(f"mongo url: {mongo_uri}")
+            mongo = PyMongo(app, uri=mongo_uri)
+            app.config['MONGO'] = mongo
+            g.db = mongo.db
+        except Exception as e:
+            app.logger.error(f"Error connecting to database: {e}")
+            raise
+        
+        try:
+            get_qdrant()
+        except Exception as e:
+            app.logger.error(f"Failed to initialize Qdrant: {e}")
+            raise
+        
+        app.config['QDRANT'] = get_qdrant
+        app.config['CHAT'] = get_chat
+        
+        @app.teardown_appcontext
+        def teardown_db(exception):
+            db = g.pop('db', None)
+            if db is not None:
+                # Perform any necessary teardown for database if needed
+                pass
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', debug=True)
+        @app.teardown_appcontext
+        def teardown_qdrant(exception):
+            qdrant = g.pop('qdrant', None)
+            if qdrant is not None:
+                # Perform any necessary teardown for qdrant if needed
+                pass
+    
+        @app.teardown_appcontext
+        def teardown_gemini_chat(exception):
+            chat = g.pop('chat', None)
+            if chat is not None:
+                # Perform any necessary teardown for chat if needed
+                pass
+     
+    with app.app_context():   
+        from src.routes import api_bp
+        app.register_blueprint(api_bp, url_prefix="/api")
+        
+    return app

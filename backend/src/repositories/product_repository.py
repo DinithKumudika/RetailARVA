@@ -1,6 +1,6 @@
-from configs.database import Database
-from models.product_model import ProductModel
-from models.entities import Product
+from src.configs.database import Database
+from src.models.product_model import ProductModel
+from src.models.entities import Product
 
 class ProductRepository:
     def __init__(self, db : Database) -> None:

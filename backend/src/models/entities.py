@@ -1,32 +1,28 @@
-from sqlalchemy import Column, String, Integer, CHAR, Boolean, Float, ForeignKey, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
+from datetime import datetime
+from bson.objectid import ObjectId
 
-Base = declarative_base()
-
-class Product(Base):
-    __tablename__ = "products"
-
-    id = Column(Integer, primary_key=True, index=True, nullable=False, autoincrement=True)
-    name = Column(String, index=True, nullable=False)
-    brand = Column(String, index=True, nullable=False)
-    category = Column(String, nullable=False)
-    price = Column(Float, nullable=False)
-    ingredients = Column(String, nullable=False)
-    key_ingredients = Column(String, nullable=False)
-    benefits = Column(String, nullable=False)
-    side_effects = Column(String, nullable=True)
-    is_natural = Column(Boolean, nullable=False)
-    concentrations = Column(String, nullable=False)
-    usage = Column(String, nullable=False)
-    application_tips = Column(String, nullable=False)
-    skin_types = Column(String, nullable=False)
-    skin_concerns = Column(String, nullable=False)
-    allergens = Column(String, nullable=True)
-    sensitivities  = Column(String, nullable=True)
-
-    def __init__(self, name, brand, category, price, ingredients, key_ingredients, benefits, is_natural, concentrations, usage, application_tips, skin_types, skin_concerns, side_effects = None, allergens = None, sensitivities = None) -> None:
+class Product:
+    def __init__(
+        self,
+        name,
+        brand,
+        category,
+        price,
+        ingredients,
+        key_ingredients,
+        benefits,
+        is_natural,
+        concentrations,
+        usage,
+        application_tips,
+        skin_types,
+        skin_concerns,
+        side_effects=None,
+        allergens=None,
+        sensitivities=None,
+        _id=None,
+    ):
+        self._id = _id if _id else ObjectId()
         self.name = name
         self.brand = brand
         self.category = category
@@ -43,50 +39,157 @@ class Product(Base):
         self.skin_concerns = skin_concerns
         self.allergens = allergens
         self.sensitivities = sensitivities
-    
+
     def to_dict(self):
         """
-        Converts the SQLAlchemy model instance into a dictionary.
+        Converts the Product object into a dictionary for MongoDB.
         """
-        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+        return {
+            "_id": self._id,
+            "name": self.name,
+            "brand": self.brand,
+            "category": self.category,
+            "price": self.price,
+            "ingredients": self.ingredients,
+            "key_ingredients": self.key_ingredients,
+            "benefits": self.benefits,
+            "side_effects": self.side_effects,
+            "is_natural": self.is_natural,
+            "concentrations": self.concentrations,
+            "usage": self.usage,
+            "application_tips": self.application_tips,
+            "skin_types": self.skin_types,
+            "skin_concerns": self.skin_concerns,
+            "allergens": self.allergens,
+            "sensitivities": self.sensitivities,
+        }
 
-class CustomerReview(Base):
-    __tablename__ = "customer_reviews"
+    @staticmethod
+    def from_dict(data):
+        """
+        Creates a Product object from a dictionary (e.g., retrieved from MongoDB).
+        """
+        return Product(
+            _id=data.get("_id"),
+            name=data.get("name"),
+            brand=data.get("brand"),
+            category=data.get("category"),
+            price=data.get("price"),
+            ingredients=data.get("ingredients"),
+            key_ingredients=data.get("key_ingredients"),
+            benefits=data.get("benefits"),
+            side_effects=data.get("side_effects"),
+            is_natural=data.get("is_natural"),
+            concentrations=data.get("concentrations"),
+            usage=data.get("usage"),
+            application_tips=data.get("application_tips"),
+            skin_types=data.get("skin_types"),
+            skin_concerns=data.get("skin_concerns"),
+            allergens=data.get("allergens"),
+            sensitivities=data.get("sensitivities"),
+        )
 
-    id = Column(Integer, primary_key=True, index=True, nullable=False, autoincrement=True)
-    product_id = Column(Integer, ForeignKey("products.id"), index=True, nullable=False)
-    review = Column(String, nullable=False)
-    rating = Column(Float, nullable=False)
+    def __repr__(self):
+        return f"Product(name='{self.name}', brand='{self.brand}', category='{self.category}')"
 
-    def __init__(self, product_id, review, rating):
-        self.product_id = product_id
+class CustomerReview:
+    def __init__(self, product_id, review, rating, _id=None):
+        self._id = _id if _id else ObjectId()
+        self.product_id = ObjectId(product_id) 
         self.review = review
         self.rating = rating
-        
 
-class Chat(Base):
-    __tablename__ = "chats"
-    chat_id = Column(Integer, primary_key=True, index=True, nullable=False, autoincrement=True)
-    messages_count = Column(Integer)
-    # created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
-    # Define relationship to access messages linked to a chat
-    messages = relationship("Message", back_populates="chat", cascade="all, delete-orphan")
-    
-    def __init__(self, messages_count):
+    def to_dict(self):
+        """
+        Converts the CustomerReview object into a dictionary for MongoDB.
+        """
+        return {
+            "_id": self._id,
+            "product_id": self.product_id,
+            "review": self.review,
+            "rating": self.rating,
+        }
+
+    @staticmethod
+    def from_dict(data):
+        """
+        Creates a CustomerReview object from a dictionary (e.g., retrieved from MongoDB).
+        """
+        return CustomerReview(
+            _id=data.get("_id"),
+            product_id=data.get("product_id"),
+            review=data.get("review"),
+            rating=data.get("rating"),
+        )
+
+    def __repr__(self):
+        return f"CustomerReview(product_id='{self.product_id}', rating={self.rating})"        
+
+class Chat:
+    def __init__(self, messages_count=0, _id=None, created_at=None):
+        self._id = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
         self.messages_count = messages_count
+        self.created_at = created_at if created_at else datetime.utcnow()  # Timestamp for creation
+        self.messages = []  # List to store embedded messages
+
+    def to_dict(self):
+        """
+        Converts the Chat object into a dictionary for MongoDB.
+        """
+        return {
+            "_id": self._id,
+            "messages_count": self.messages_count,
+            "created_at": self.created_at,
+            "messages": [message.to_dict() for message in self.messages],  # Embed messages
+        }
+
+    @staticmethod
+    def from_dict(data):
+        """
+        Creates a Chat object from a dictionary (e.g., retrieved from MongoDB).
+        """
+        chat = Chat(
+            _id=data.get("_id"),
+            messages_count=data.get("messages_count"),
+            created_at=data.get("created_at"),
+        )
+        # Add embedded messages
+        chat.messages = [Message.from_dict(message) for message in data.get("messages", [])]
+        return chat
+
+    def __repr__(self):
+        return f"Chat(_id='{self._id}', messages_count={self.messages_count})"
         
 
-class Message(Base):
-    __tablename__ = "chat_messages"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    chat_id = Column(Integer, ForeignKey("chats.chat_id"), nullable=False)
-    role = Column(String, nullable=False)
-    content = Column(String, nullable=False)
-    chat = relationship("Chat", back_populates="messages")
-
-    def __init__(self, chat_id, role, content):
-        self.chat_id = chat_id
+class Message:
+    def __init__(self, chat_id, role, content, _id=None):
+        self._id = _id if _id else ObjectId()  # MongoDB uses `_id` as the primary key
+        self.chat_id = ObjectId(chat_id)  # Reference to the parent chat
         self.role = role
         self.content = content
+
+    def to_dict(self):
+        """
+        Converts the Message object into a dictionary for MongoDB.
+        """
+        return {
+            "_id": self._id,
+            "chat_id": self.chat_id,
+            "role": self.role,
+            "content": self.content,
+        }
+
+    @staticmethod
+    def from_dict(data):
+        """
+        Creates a Message object from a dictionary (e.g., retrieved from MongoDB).
+        """
+        return Message(
+            _id=data.get("_id"),
+            chat_id=data.get("chat_id"),
+            role=data.get("role"),
+            content=data.get("content"),
+        )
+
+    def __repr__(self):
+        return f"Message(chat_id='{self.chat_id}', role='{self.role}')"

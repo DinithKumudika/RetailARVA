@@ -1,6 +1,6 @@
-from configs.database import Database
-from models.entities import Chat, Message
-from enums import ChatMessageRole
+from src.configs.database import Database
+from src.models.entities import Chat, Message
+from src.enums import ChatMessageRole
 
 class MessageRepository:
      def __init__(self, db : Database) -> None:

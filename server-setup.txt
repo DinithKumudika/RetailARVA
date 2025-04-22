@@ -1,0 +1,35 @@
+# Configure git and clone repo
+
+git config --global user.name "dinith kumudika"
+git config --global user.email "dinithwalpitagama@gmail.com"
+
+git clone https://github.com/DinithKumudika/RetailARVA.git
+cd RetailARVA/
+git checkout server-deployment
+
+chmod +x setup-server.sh
+sudo ./setup-server.sh
+
+
+
+# If docker error occurs
+
+## make sure docker is running
+sudo systemctl status docker
+sudo systemctl start docker
+
+## verify user permission
+groups $(whoami)
+
+## If docker is not listed, add your user to the docker group
+sudo usermod -aG docker $(whoami)
+
+## check docker socket permission
+ls -l /var/run/docker.sock
+srw-rw---- 1 root docker 0 Jan  1 00:00 /var/run/docker.sock
+
+## fix permissions
+sudo chown root:docker /var/run/docker.sock
+sudo chmod 660 /var/run/docker.sock
+
+sudo usermod -aG docker Ubuntu

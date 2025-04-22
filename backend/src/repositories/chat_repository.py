@@ -1,5 +1,5 @@
-from configs.database import Database
-from models.entities import Chat
+from src.configs.database import Database
+from src.models.entities import Chat
 
 class ChatRepository:
      def __init__(self, db : Database) -> None:
