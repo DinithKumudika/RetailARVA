@@ -420,7 +420,7 @@ def chat_with_assistant(chat_id: str):
             ))
 
             chat_history = get_chat_history_by_chat_id(chat_id=chat_id)
-            is_updated = update_message_count(chat_id=str(chat_id), count=len(chat_history))
+            is_updated = update_message_count(chat_id=chat_id, count=len(chat_history))
 
             if is_updated:
                 response = make_response(jsonify({
