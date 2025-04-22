@@ -161,6 +161,8 @@ product_info_prompt: str = """"
     - Based on that information, answer the user's query.
     - don't mention to user that you are getting information from a context or product profile.
     - Your response should be natural as possible without any special characters or formatting.
+    - Keep the response concise without overwhelming user with unnecessary information.
+    - Your response should be natural as possible.
     
     <Product Information>
     {product_info}
