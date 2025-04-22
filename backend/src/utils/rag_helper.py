@@ -25,12 +25,21 @@ class RagHelper:
             temperature=0.0,
             convert_system_message_to_human=True
         )
+
     @staticmethod
     def get_recommendation_model():
         return ChatOllama(
             base_url=app.config.get('OLLAMA_URL'),
             model=app.config.get('RECOMMENDATION_MODEL_ID'),
             temperature=0.5
+        )
+
+    @staticmethod
+    def get_tts_input_model():
+        return ChatOllama(
+            base_url=app.config.get('OLLAMA_URL'),
+            model=app.config.get('TTS_INPUT_PARSER_MODEL_ID'),
+            temperature=0.0
         )
 
     @staticmethod

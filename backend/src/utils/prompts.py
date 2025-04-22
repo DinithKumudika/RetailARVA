@@ -118,6 +118,42 @@ classification_prompt: str = """"
     - Only return the name of the most suitable category from the above (ex-: "product_info")
 """
 
+response_parse_prompt : str = """"
+    ## Instructions:
+    - Consider the given user's query and the conversation history,
+    - The user query will be a given to a Text-to-speech as an input.
+    - The query should be formatted carefully to ensure clarity, naturalness, and accurate pronunciation. Below are key guidelines for formatting the query
+    
+    ## Guidelines
+    
+    1. Clean and Clear Text:
+    - Remove unnecessary symbols, formatting tags, or markup (e.g., HTML, XML)
+    - Eliminate redundant spaces, line breaks, or special characters (e.g., %, &, #) that may confuse the system.
+    
+    2. Proper Punctuation:
+    - Use standard punctuation (e.g., commas, periods, question marks) to guide pauses and intonation.
+    - Avoid excessive punctuation (e.g., "!!!!" or "...") as it may lead to unnatural speech.
+    
+    3. Correct Capitalization:
+    - Use sentence-case or proper capitalization to help the TTS system identify proper nouns and sentence boundaries.
+    - Avoid all-caps or inconsistent capitalization, which may cause mispronunciation or unnatural emphasis.
+    
+    4. Handle Abbreviations and Acronyms:
+    - Expand abbreviations where possible to avoid misinterpretation (e.g., "LKR" to "Rupees" or "St." to "Street").
+    - For acronyms, decide whether they should be pronounced as words (e.g., "NASA") or as individual letters (e.g., "FBI").
+    - Example: "Meet me at 123 Main Street" instead of "Meet me at 123 Main St."
+    
+    5. Numbers:
+    - Write numbers in a way that reflects how they should be spoken (e.g., "123" as "one hundred twenty-three" or "one two three" depending on context).
+    
+    6. Special Characters and Symbols:
+    - Replace symbols with their spoken equivalents (e.g., "$10" as "ten dollars", "@" as "at").
+    - Example: "The price is ten dollars" instead of "The price is $10."
+    
+    ## Output:
+    - Only return the formatted text without any additional explanation or comments.
+"""
+
 product_info_prompt: str = """"
     ## Instructions:
     - Consider the given information about the skincare product and the user's query.

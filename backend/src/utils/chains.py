@@ -5,7 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, \
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 
 from src.utils.parsers import QuestionArrayOutputParser
-from src.utils.prompts import product_suitability_prompt, recommendation_prompt, classification_prompt, system_prompt, greet_prompt, product_info_prompt, query_expansion_prompt, qa_system_prompt
+from src.utils.prompts import product_suitability_prompt, recommendation_prompt, classification_prompt, system_prompt, greet_prompt, product_info_prompt, query_expansion_prompt, qa_system_prompt, response_parse_prompt
 from src.utils.rag_helper import RagHelper
 
 classification_examples = [
@@ -154,6 +154,24 @@ def classification_chain_invoke(model, query):
 
     result: str = classification_chain.invoke({"query": query})
     return result.strip().lower()
+
+def get_parse_response_chain(model):
+    """Chain for parsing the model's response."""
+    response_parse_prompt_template = ChatPromptTemplate.from_messages(
+        ("system", response_parse_prompt),
+        ("user", "{query}"),
+    )
+
+    response_parse_chain = (
+        {
+            "query": RunnablePassthrough()
+        }
+        | response_parse_prompt_template
+        | model
+        | StrOutputParser()
+    )
+
+    return response_parse_chain
 
 def get_product_info_chain(model):
 

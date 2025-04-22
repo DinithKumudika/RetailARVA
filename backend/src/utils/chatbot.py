@@ -2,7 +2,7 @@ import langchain
 from langchain_community.chat_message_histories import MongoDBChatMessageHistory
 from langchain_core.runnables import RunnableLambda, RunnableBranch, RunnablePassthrough, RunnableWithMessageHistory
 from src.utils.chains import classification_chain_invoke, get_recommendation_chain, \
-    get_product_info_chain, get_suitability_chain, get_default_chain, get_greet_chain
+    get_product_info_chain, get_suitability_chain, get_default_chain, get_greet_chain, get_parse_response_chain
 from enum import Enum
 from src.utils.rag_helper import RagHelper
 from flask import current_app as app
@@ -116,6 +116,8 @@ class Chatbot:
             )
 
             default_chain = get_default_chain(self.llm)
+            parse_response_chain = get_parse_response_chain(RagHelper.get_tts_input_model())
+
             default_chain_with_history = RunnableWithMessageHistory(
                 default_chain,
                 lambda session_id: self.chat_session,
@@ -145,6 +147,7 @@ class Chatbot:
                     "chat_history": lambda inputs: inputs["chat_history"]
                 }
                 | routed_chain
+                | parse_response_chain
             )
 
             user_info = RagHelper.get_formatted_user_profile(user_id)
