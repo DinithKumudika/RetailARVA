@@ -120,9 +120,10 @@ classification_prompt: str = """"
 
 response_parse_prompt : str = """"
     ## Instructions:
-    - Consider the given user's query and the conversation history,
+    - Consider the given user's query,
     - The user query will be a given to a Text-to-speech as an input.
     - The query should be formatted carefully to ensure clarity, naturalness, and accurate pronunciation. Below are key guidelines for formatting the query
+    - Don't rewrite the query or change the meaning of it. just follow the below guidelines to make it optimized for the Text To Speech
     
     ## Guidelines
     
