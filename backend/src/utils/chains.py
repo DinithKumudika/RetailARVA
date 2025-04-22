@@ -158,8 +158,10 @@ def classification_chain_invoke(model, query):
 def get_parse_response_chain(model):
     """Chain for parsing the model's response."""
     response_parse_prompt_template = ChatPromptTemplate.from_messages(
-        ("system", response_parse_prompt),
-        ("user", "{query}"),
+        [
+            ("system", response_parse_prompt),
+            ("human", "{query}"),
+        ]
     )
 
     response_parse_chain = (
