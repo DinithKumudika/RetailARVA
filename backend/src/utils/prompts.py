@@ -196,8 +196,9 @@ recommendation_prompt: str = """"
     - Consider the given information about the skincare product, the user's skin profile and preferences, and the set of similar skincare products.
     - Based on that information, try to provide the product recommendations.
     - Keep the response short and concise without overwhelming user with unnecessary information.
-    - Limit the response around from 30 to 60 words.
+    - Limit the response around from 30 to 50 words.
     - Your response should be natural as possible without any special characters or formatting.
+    - *Strictly use the product information provided in the given context and user profile to make your recommendations.*
     
     [PRODUCT SELECTION LOGIC]
     *Step 1: Understand the Query*
