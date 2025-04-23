@@ -61,10 +61,10 @@ services:
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL_ID=llama3.1:latest
       - OLLAMA_EMBEDDING_MODEL_ID=nomic-embed-text:latest
-      - CLASSIFICATION_MODEL_ID=gemini-2.5-pro-exp-03-25
+      - CLASSIFICATION_MODEL_ID=gemini-2.5-flash-preview-04-17
       - TTS_INPUT_PARSER_MODEL_ID=gemma3:4b-it-qat
       - RECOMMENDATION_MODEL_ID=llama3.1:latest
-      - GEMINI_MODEL_ID=gemini-2.5-pro-preview-03-25
+      - GEMINI_MODEL_ID=gemini-2.5-flash-preview-04-17
       - GEMINI_EMBEDDING_MODEL_ID=llama3.1:latest
       - GOOGLE_GENERATIVE_LANGUAGE_API_KEY=AIzaSyDhXLHoIJmyXVyzIwTOW8sQaqUYQT4Lno4
       - GROQ_API_KEY=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
