@@ -162,6 +162,7 @@ product_info_prompt: str = """"
     - don't mention to user that you are getting information from a context or product profile.
     - Your response should be natural as possible without any special characters or formatting.
     - Keep the response concise without overwhelming user with unnecessary information.
+    - Limit the response around from 30 to 60 words.
     - Your response should be natural as possible.
     
     <Product Information>
@@ -176,6 +177,7 @@ product_suitability_prompt: str = """
     - Provide any supporting information to justify your answer.
     - If you don't have sufficient information for the task then ask for more information or clarifications.
     - Keep the response short and concise without overwhelming user with unnecessary information.
+    - Limit the response around from 30 to 60 words.
     - Don't mention to user that you are getting information from a context, product profile or a user profile.
     - Your response should be natural as possible without any special characters or formatting.
         
@@ -194,6 +196,7 @@ recommendation_prompt: str = """"
     - Consider the given information about the skincare product, the user's skin profile and preferences, and the set of similar skincare products.
     - Based on that information, try to provide the product recommendations.
     - Keep the response short and concise without overwhelming user with unnecessary information.
+    - Limit the response around from 30 to 60 words.
     - Your response should be natural as possible without any special characters or formatting.
     
     [PRODUCT SELECTION LOGIC]
