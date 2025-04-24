@@ -9,14 +9,12 @@ from src.utils.prompts import product_suitability_prompt, recommendation_prompt,
 from src.utils.rag_helper import RagHelper
 
 classification_examples = [
-    {"query": "Tell me about the Acme Moisturizer.", "category": "product_info"},
-    {"query": "Can you suggest a good face wash for combination skin?", "category": "recommendation"},
     {"query": "What are the ingredients in the [Brand B] moisturizer?", "category": "product_info"},
     {"query": "Is the [Product C] serum suitable for my sensitive skin?", "category": "suitability_check"},
-    {"query": "Is this product good for sensitive skin like mine?", "category": "suitability_check"},
     {"query": "What are some alternatives to the Acme Cleanser for oily skin?", "category": "recommendation"},
     {"query": "Does [Brand E] have any products for acne-prone skin?", "category": "recommendation"},
-    {"query": "How do I apply the [Product G] cream?", "category": "product_info"}
+    {"query": "How do I apply the [Product G] cream?", "category": "product_info"},
+    {"query": "Is this cream better than [Product J] for dry skin?", "category": "suitability_check"}
 ]
 
 # Format Context
