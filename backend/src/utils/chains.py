@@ -9,12 +9,12 @@ from src.utils.prompts import product_suitability_prompt, recommendation_prompt,
 from src.utils.rag_helper import RagHelper
 
 classification_examples = [
-    {"query": "What are the ingredients in the [Brand B] moisturizer?", "category": "product_info"},
-    {"query": "Is the [Product C] serum suitable for my sensitive skin?", "category": "suitability_check"},
+    {"query": "What are the ingredients in the Nivea moisturizer?", "category": "product_info"},
+    {"query": "Is the Nivea Extra White Body Serum suitable for my sensitive skin?", "category": "suitability_check"},
     {"query": "What are some alternatives to the Acme Cleanser for oily skin?", "category": "recommendation"},
-    {"query": "Does [Brand E] have any products for acne-prone skin?", "category": "recommendation"},
-    {"query": "How do I apply the [Product G] cream?", "category": "product_info"},
-    {"query": "Is this cream better than [Product J] for dry skin?", "category": "suitability_check"}
+    {"query": "Does CeraVe brand have any products for acne-prone skin?", "category": "recommendation"},
+    {"query": "How do I apply the Golden Touch Pigmentation cream?", "category": "product_info"},
+    {"query": "Is this cream better than Olifair Skin Lightening Day for dry skin?", "category": "suitability_check"}
 ]
 
 # Format Context
