@@ -1,6 +1,8 @@
-from src.models.models import Product, User, Chat, Message, UserProfile
+from src.models.models import Product, User, Chat, Message, UserProfile, Timelog
 from flask import current_app as app
-from src.exceptions.exceptions import NoProductsFoundError, ProductNotFoundError, UserInsertionError, ProfileDataInsertionError, ProductInsertionError, UserNotFoundError, UserProfileNotFoundError, ChatNotFoundError, ChatCreationError, ChatUpdateError, ChatHistoryNotFoundError, MessageInsertionError
+from src.exceptions.exceptions import NoProductsFoundError, ProductNotFoundError, UserInsertionError, \
+    ProfileDataInsertionError, ProductInsertionError, UserNotFoundError, UserProfileNotFoundError, ChatNotFoundError, \
+    ChatCreationError, ChatUpdateError, ChatHistoryNotFoundError, MessageInsertionError, TimelogInsertionError
 from bson.objectid import ObjectId
 from typing import List, Optional
 from pymongo.errors import PyMongoError, BulkWriteError
@@ -143,11 +145,43 @@ def add_user(user: User) -> ObjectId:
         # Handle cases where user.to_dict() fails
         print(f"Invalid user object: {e}")
         raise ValueError(f"Failed to convert user to a dictionary: {e}")
-    
+
     except PyMongoError as pe:
         # Handle general database-related errors
         print(f"Database error while adding user: {pe}")
         raise pe
+
+def add_timelog(timelog: Timelog) -> ObjectId:
+    """
+    Adds a timelog to the database.
+
+    Args:
+        timelog (Timelog): The timelog object to be added.
+
+    Returns:
+        ObjectId: The _id of the inserted tiemlog.
+
+    Raises:
+        ValueError: If the input is invalid or cannot be converted to a dictionary.
+        PyMongoError: If there is a database-related error.
+    """
+    db = app.config['MONGO'].db
+    try:
+        result = db.timelog.insert_one(timelog.to_dict())
+        if not result.acknowledged:
+            print("timelog insertion failed")
+            raise TimelogInsertionError()
+        return result.inserted_id
+    except AttributeError as e:
+        # Handle cases where user.to_dict() fails
+        print(f"Invalid timelog object: {e}")
+        raise ValueError(f"Failed to convert timelog to a dictionary: {e}")
+
+    except PyMongoError as pe:
+        # Handle general database-related errors
+        print(f"Database error while adding tiemlog: {pe}")
+        raise pe
+
 
 def add_user_profile(profile_data: UserProfile):
     """

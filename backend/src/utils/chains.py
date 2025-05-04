@@ -139,7 +139,7 @@ def classification_chain_invoke(model, query):
         examples=classification_examples,
     )
 
-    print("formatted few show prompt:\n")
+    print("formatted few shot prompt:\n")
     print(few_shot_prompt.format())
 
     classification_prompt_template = ChatPromptTemplate.from_messages(

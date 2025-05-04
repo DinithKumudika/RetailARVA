@@ -48,6 +48,7 @@ class OllamaConfig(Config):
     CLASSIFICATION_MODEL_ID = os.getenv('CLASSIFICATION_MODEL_ID')
     RECOMMENDATION_MODEL_ID = os.getenv('RECOMMENDATION_MODEL_ID')
     TTS_INPUT_PARSER_MODEL_ID = os.getenv('TTS_INPUT_PARSER_MODEL_ID')
+    RAG_EVAL_MODEL_ID = os.getenv('RAG_EVAL_MODEL_ID')
 
 class GoogleConfig(Config):
     GOOGLE_GENERATIVE_LANGUAGE_API_KEY = os.getenv('GOOGLE_GENERATIVE_LANGUAGE_API_KEY')
@@ -66,3 +67,7 @@ class LangsmithConfig(Config):
     LANGSMITH_ENDPOINT = os.getenv('LANGSMITH_ENDPOINT', 'https://api.smith.langchain.com')
     LANGSMITH_API_KEY = os.getenv('LANGSMITH_API_KEY')
     LANGSMITH_PROJECT = os.getenv('LANGSMITH_PROJECT', 'retailarva-chatbot')
+
+class DeepEvalConfig(Config):
+    DEEPEVAL_API_KEY = os.getenv('DEEPEVAL_API_KEY')
+    DEEPEVAL_RESULTS_FOLDER = os.getenv('DEEPEVAL_RESULTS_FOLDER')
