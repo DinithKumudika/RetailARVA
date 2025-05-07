@@ -122,11 +122,10 @@ classification_prompt: str = """"
 
 response_parse_prompt : str = """"
     ## Instructions:
-    - Consider the given query,
-    - The query will be a given to a Text-to-speech as an input.
-    - The query should be formatted carefully to ensure clarity, naturalness, and accurate pronunciation. Below are key guidelines for formatting the query
-    - Focus on sounding natural when read aloud by a voice assistant.
-    - Don't change the meaning of query. just follow the below guidelines to make it optimized for the Text To Speech
+    - Consider the given input,
+    - The input should be formatted carefully to ensure clarity, naturalness, and accurate pronunciation. Below are key guidelines for formatting the input
+    - Focus on making the input to sound natural when read aloud by a text to speech.
+    - Don't change the input. just follow the below guidelines to make it optimized for a Text To Speech
     
     ## Guideline
     1. Friendly and humane Tone:
@@ -162,7 +161,7 @@ response_parse_prompt : str = """"
     - Example: "The price is ten dollars" instead of "The price is $10."
     
     ## Output:
-    - Only return the formatted text without any additional explanation or comments.
+    - Your output should be *only the formatted input without any additional explanation or comments*.
 """
 
 product_info_prompt: str = """"
@@ -194,7 +193,7 @@ product_suitability_prompt: str = """
     - Speak like a friendly and helpful assistant.
         
     <Product Information>
-    {product_info}
+    {product_info}  
     </Product Information>
         
     <User Information>
