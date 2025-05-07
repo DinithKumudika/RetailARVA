@@ -162,6 +162,9 @@ response_parse_prompt : str = """"
     
     ## Output:
     - Your output should be *only the formatted input without any additional explanation or comments*.
+    
+    ## Input:
+    {input}
 """
 
 product_info_prompt: str = """"
