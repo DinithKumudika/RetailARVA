@@ -282,3 +282,36 @@ class Message:
 
     def __repr__(self):
         return f"Message(chat_id='{self.chat_id}', role='{self.role}', message_id='{self.message_id}')"
+
+class Timelog:
+    def __init__(self, user_id: str, task_1: float, task_2: float, task_3: float, _id = None):
+        self.id: ObjectId = _id if _id else ObjectId()
+        self.user_id: ObjectId = ObjectId(user_id)
+        self.task_1: float = task_1
+        self.task_2: float = task_2
+        self.task_3: float = task_3
+
+    def to_dict(self):
+        """
+        Converts the Timelog object into a dictionary for MongoDB.
+        """
+        return {
+            "_id": self.id,
+            "user_id": self.user_id,
+            "task_1": self.task_1,
+            "task_2": self.task_2,
+            "task_3": self.task_3,
+        }
+
+    @staticmethod
+    def from_dict(data):
+        """
+        Creates a Message object from a dictionary (e.g., retrieved from MongoDB).
+        """
+        return Timelog(
+            _id=data.get("_id"),
+            user_id=data.get("user_id"),
+            task_1=data.get("task_1"),
+            task_2=data.get("task_2"),
+            task_3=data.get("task_3"),
+        )

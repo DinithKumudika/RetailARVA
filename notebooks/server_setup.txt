@@ -23,4 +23,5 @@ sudo ufw reload
 sudo ufw status
 
 ollama pull llama3.3:70b-instruct-q4_K_M
+ollama pull nomic-embed-text
 

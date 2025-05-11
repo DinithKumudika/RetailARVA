@@ -218,7 +218,6 @@ class RagHelper:
 
     @staticmethod
     def retrieve_recommendation(inputs):
-        # TODO: filter out docs with ingredients user avoids
         product_info = inputs["product_info"]
         user_info = inputs["user_info"]
         query = inputs["query"]
