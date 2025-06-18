@@ -115,10 +115,10 @@ class VectorDb:
             qdrant = QdrantVectorStore.from_documents(
                 docs,
                 self.embeddings,
-                url="https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io",
+                url="https://fdda17ab-8e55-4273-a1b2-61227eaf0835.europe-west3-0.gcp.cloud.qdrant.io",
                 prefer_grpc=False,
                 https=True,
-                api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.BqanaVupoaZV3GGVQGA5nOdGT3kHQDzOWJZC476Ruh0",
+                api_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.iB5o-6sSQPdGDJfljEvc9cV73H7dy-0AmByR9-VBVN4",
                 collection_name=collection
             )
             self.vector_store = qdrant
