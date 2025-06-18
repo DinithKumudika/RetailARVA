@@ -44,8 +44,8 @@ services:
       - GROQ_API_KEY=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
       - GROQ_MODEL_ID=llama-3.1-8b-instant
       - HUGGINGFACE_EMBEDDING_MODEL_ID=BAAI/bge-large-en-v1.5
-      - QDRANT_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.Z5PMRPegDxYyvVlCmkGmiLD0UuAj0WdrsqeXEMvJz_Q
-      - QDRANT_CLUSTER_URL=https://27c6018a-d381-49b4-aef4-e922ce3eea85.us-west-2-0.aws.cloud.qdrant.io
+      - QDRANT_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.iB5o-6sSQPdGDJfljEvc9cV73H7dy-0AmByR9-VBVN4
+      - QDRANT_CLUSTER_URL=https://fdda17ab-8e55-4273-a1b2-61227eaf0835.europe-west3-0.gcp.cloud.qdrant.io
       - ELEVENLABS_API_KEY=sk_b0206ca0a7d97fa2b60ae41448b7f47e02872aec6d6cb65f
       - GOOGLE_APPLICATION_CREDENTIALS=C:\\Users\\dinit\\Documents\\Research\\Development\\test-playground\\retailarva-6169e9007515.json
       - GRADIO_URL=http://127.0.0.1:7860
